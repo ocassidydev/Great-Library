@@ -28,6 +28,10 @@ SHEET = GSPREAD_CLIENT.open('great_library')
 #GOOGLE BOOKS
 GBOOKS = "https://www.googleapis.com/books/v1/volumes?q=intitle:"
 
+#FIGLET
+f = Figlet()
+HEADER = f.renderText("    Great Library")
+
 # search = input("What book are you looking for?\n")
 
 # resp = urlopen(f"{api}{search}")
@@ -35,25 +39,62 @@ GBOOKS = "https://www.googleapis.com/books/v1/volumes?q=intitle:"
 
 # print(book_data['items'][0]['volumeInfo'])
 
-#Testing console display features
-#FIGLET
-f = Figlet()
-header = f.renderText("hello")
+def check_for_user(name):
+    """
+    Checks the gsheet for the name entered on the landing page
+    If there's a match returns true, if no match returns false
+    """
+    worksheet_list = [worksheet.title for worksheet in SHEET.worksheets()]
+    if name in worksheet_list:
+        return True
+    elif name not in worksheet_list:
+        return False
+
+def display_landing(stdscr):
+    """
+    Displays the landing page on program start
+    Takes user's name as input to retrieve catalog or set up new one
+    """
+    stdscr.clear()
+    stdscr.addstr(HEADER)
+    stdscr.addstr(7, 0, "\tWelcome to the great library, a console-based catalog of all\n\tthe books you have read and want to read!\n\n\tEnter your name: ")
+
+    win = curses.newwin(1, 20, 10, 25)
+    box = Textbox(win)
+    stdscr.refresh()
+    box.edit()
+
+    name = box.gather().strip().lower()
+    stdscr.addstr(11, 0, f"\tWelcome {name.title()}!")
+    name = name.replace(" ", "")
+
+    if check_for_user(name):
+        stdscr.addstr(12, 0, f"\tYou have an active account with {len(SHEET.worksheet(name).get_all_values())-1} entries. Access your library? (y/n)")
+    else:
+        stdscr.addstr(12, 0, "\tYou have not yet created an account. Create a new account? (y/n)")
+
+    while True:
+        key = stdscr.getkey()
+        if key == "y":
+            # if not check_for_user(name):
+            #     create_new_user(name)
+            return name
+        elif key == "n":
+            display_landing(stdscr)
 
 def main(stdscr):
-    stdscr.clear()
-    stdscr.addstr(header)
-    stdscr.refresh()
+    #CONFIGURE COLORS
+    curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_WHITE)
+    curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
+    curses.init_pair(3, curses.COLOR_RED, curses.COLOR_WHITE)
+    BLUE_AND_WHITE = curses.color_pair(1)
+    GREEN_AND_BLACK = curses.color_pair(2)
+    RED_AND_WHITE = curses.color_pair(3)
+    stdscr.attron(GREEN_AND_BLACK)
+    name = display_landing(stdscr)
+    print(name)
     stdscr.getch()
 
-    #CONFIGURE COLORS
-    # curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_YELLOW)
-    # curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
-    # curses.init_pair(3, curses.COLOR_RED, curses.COLOR_WHITE)
-    # BLUE_AND_YELLOW = curses.color_pair(1)
-    # GREEN_AND_BLACK = curses.color_pair(2)
-    # RED_AND_WHITE = curses.color_pair(3)
-    
     #ECHO USER KEYSTROKES
     #curses.echo()
 
