@@ -2,6 +2,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 from urllib.request import urlopen
 import json
+from pyfiglet import print_figlet
 
 #Plugging in APIs
 #DRIVE AND SHEET
@@ -17,11 +18,15 @@ GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
 SHEET = GSPREAD_CLIENT.open('great_library')
 
 #GOOGLE BOOKS
-api = "https://www.googleapis.com/books/v1/volumes?q=intitle:"
-search = input("What book are you looking for?\n")
+GBOOKS = "https://www.googleapis.com/books/v1/volumes?q=intitle:"
 
-resp = urlopen(f"{api}{search}")
-book_data = json.load(resp)
+# search = input("What book are you looking for?\n")
 
-print(book_data['items'][0]['volumeInfo'])
+# resp = urlopen(f"{api}{search}")
+# book_data = json.load(resp)
 
+# print(book_data['items'][0]['volumeInfo'])
+
+#Testing console display features
+#FIGLET
+print_figlet("Hello")
