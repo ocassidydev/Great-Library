@@ -1,8 +1,10 @@
 import gspread
 from google.oauth2.service_account import Credentials
+from urllib.request import urlopen
+import json
 
-#Need to add books API to scope
 #Plugging in APIs
+#DRIVE AND SHEET
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",
@@ -14,8 +16,12 @@ SCOPED_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
 SHEET = GSPREAD_CLIENT.open('great_library')
 
-wks = SHEET.worksheet('oran')
+#GOOGLE BOOKS
+api = "https://www.googleapis.com/books/v1/volumes?q=intitle:"
+search = input("What book are you looking for?\n")
 
-data = wks.get_all_values()
+resp = urlopen(f"{api}{search}")
+book_data = json.load(resp)
 
-print(data)
+print(book_data['items'][0]['volumeInfo'])
+
