@@ -1,8 +1,14 @@
+#GOOGLE DRIVE/SHEETS API
 import gspread
 from google.oauth2.service_account import Credentials
+#GOOGLE BOOKS API
 from urllib.request import urlopen
 import json
+#CONSOLE TOOLS
 from pyfiglet import print_figlet
+from colorama import init
+init()
+from colorama import Fore, Back, Style
 
 #Plugging in APIs
 #DRIVE AND SHEET
@@ -30,3 +36,11 @@ GBOOKS = "https://www.googleapis.com/books/v1/volumes?q=intitle:"
 #Testing console display features
 #FIGLET
 print_figlet("Hello")
+
+#COLORAMA
+print(Fore.RED + 'some red text')
+print(Back.GREEN + 'and with a green background' + Back.RESET)
+
+print(Style.DIM + 'and in dim text')
+print(Style.BRIGHT + 'and in bright text')
+print(Style.RESET_ALL + 'back to normal now')
