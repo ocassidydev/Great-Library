@@ -29,8 +29,7 @@ SHEET = GSPREAD_CLIENT.open('great_library')
 GBOOKS = "https://www.googleapis.com/books/v1/volumes?q=intitle:"
 
 #FIGLET
-f = Figlet()
-HEADER = f.renderText("    Great Library")
+F = Figlet()
 
 # search = input("What book are you looking for?\n")
 
@@ -38,6 +37,23 @@ HEADER = f.renderText("    Great Library")
 # book_data = json.load(resp)
 
 # print(book_data['items'][0]['volumeInfo'])
+
+class UserLibrary:
+    """
+    Stores the user's data as a list of dictionaries for displaying and editing
+    Contains various methods for filtering, sorting, and displaying the library
+    """
+    def __init__(name):
+        self.name = name
+        self.books = SHEET.worksheet(name).get_all_records()
+
+    #def sort(self, cat):
+
+    #def filter(self, cat):
+
+    #def edit(self, book):
+
+    #def update_data(self):
 
 def check_for_user(name):
     """
@@ -56,15 +72,31 @@ def display_landing(stdscr):
     Takes user's name as input to retrieve catalog or set up new one
     """
     stdscr.clear()
-    stdscr.addstr(HEADER)
-    stdscr.addstr(7, 0, "\tWelcome to the great library, a console-based catalog of all\n\tthe books you have read and want to read!\n\n\tEnter your name: ")
+    header = F.renderText("    Great Library")
+    stdscr.addstr(header)
+    stdscr.addstr(7, 0, "\tWelcome to the great library, a console-based catalog of all\n\tthe books you have read, and want to read!\n\n\tEnter your name: ")
 
     win = curses.newwin(1, 20, 10, 25)
     box = Textbox(win)
     stdscr.refresh()
     box.edit()
 
-    name = box.gather().strip().lower()
+    #Try except is to prevent user from accessing a reserved sheet for templating all other sheets and entering an empty name
+    try:
+        name = box.gather().strip().lower()
+        if name == "__template__":
+            raise ValueError(
+                "'__template__' is a reserved user account. Enter a different name"
+            )
+        if name.strip() == "":
+            raise ValueError(
+                "cannot accept an empty entry"
+            )
+    except ValueError as e:
+        stdscr.addstr(11, 0, f"\tInvalid entry: {e}, please try again (any key to continue)")
+        stdscr.getch()
+        return display_landing(stdscr)
+
     stdscr.addstr(11, 0, f"\tWelcome {name.title()}!")
     name = name.replace(" ", "")
 
@@ -76,24 +108,37 @@ def display_landing(stdscr):
     while True:
         key = stdscr.getkey()
         if key == "y":
-            # if not check_for_user(name):
-            #     create_new_user(name)
+            if not check_for_user(name):
+                #creates new sheet from template for user data
+                SHEET.duplicate_sheet(0,new_sheet_name=name)
+                stdscr.getch()
             return name
         elif key == "n":
-            display_landing(stdscr)
+            return display_landing(stdscr)
+
+# def display_home(stdscr, library):
+#     """
+#     Displays the user's home page
+#     From here they can navigate to the other interfaces
+#     """
+
+#def display_add_ui(stdscr)
+
+#def display_book_list(stdscr, library):
+
+#def display_edit_ui(stdscr, library)
 
 def main(stdscr):
     #CONFIGURE COLORS
-    curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_WHITE)
-    curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
-    curses.init_pair(3, curses.COLOR_RED, curses.COLOR_WHITE)
-    BLUE_AND_WHITE = curses.color_pair(1)
-    GREEN_AND_BLACK = curses.color_pair(2)
-    RED_AND_WHITE = curses.color_pair(3)
+    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+    GREEN_AND_BLACK = curses.color_pair(1)
     stdscr.attron(GREEN_AND_BLACK)
+    
     name = display_landing(stdscr)
-    print(name)
+    print(SHEET.worksheet(name).get_all_records())
     stdscr.getch()
+
+    # library = UserLibrary(name)
 
     #ECHO USER KEYSTROKES
     #curses.echo()
