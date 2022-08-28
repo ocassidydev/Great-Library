@@ -36,8 +36,9 @@ class UserLibrary:
     Stores the user's data as a list of dictionaries for displaying and editing
     Contains various methods for filtering, sorting, and displaying the library
     """
-    def __init__(self, name):
+    def __init__(self, name, user):
         self.name = name
+        self.user = user
         self.books = SHEET.worksheet(name).get_all_records()
 
     # def add_book(self, data):
@@ -53,24 +54,129 @@ class UserLibrary:
 
     #def update_data(self):
 
-def render_heading(stdscr, heading):
+class ConsoleUI:
     """
-    Renders a figlet ASCII render of text at the top of the page
+    Parent class of all interfaces in the program
+    Contains render_heading method to display the interface titles
     """
-    stdscr.clear()
-    header = F.renderText(f"       {heading}")
-    stdscr.addstr(header)
+    def __init__(self, stdscr, heading, message):
+        self.scr = stdscr
+        self.heading = heading
+        self.message = message
+    
+    def render_heading(self):
+        """
+        Renders a figlet ASCII render of text at the top of the page
+        """
+        self.scr.clear()
+        header = F.renderText(f"       {self.heading}")
+        self.scr.addstr(header)
 
-def check_for_user(name):
+    def display_message(self):
+        """
+        Displays the main message of the interface to the user
+        """
+        self.scr.addstr(7, 0, self.message)
+
+    def user_input(self, y, x):
+        """
+        Creates a textbox for the user to enter at position (x, y)
+        Returns the user input
+        """
+        win = curses.newwin(1, curses.COLS-(x+1), y, x)
+        box = Textbox(win)
+        self.scr.refresh()
+        box.edit()
+
+        return box.gather().strip().lower()
+
+
+class LandingUI(ConsoleUI):
     """
-    Checks the gsheet for the name entered on the landing page
-    If there's a match returns true, if no match returns false
+    Class for landing page interface object
     """
-    worksheet_list = [worksheet.title for worksheet in SHEET.worksheets()]
-    if name in worksheet_list:
+    def __init__(self, stdscr, heading, message):
+        super().__init__(stdscr, heading, message)
+
+    def check_for_user(self):
+        """
+        Checks the gsheet for the name entered on the landing page
+        If there's a match returns true, if no match returns false
+        """
+        worksheet_list = [worksheet.title for worksheet in SHEET.worksheets()]
+        if self.user in worksheet_list:
+            return True
+        elif self.user not in worksheet_list:
+            return False
+
+    def error_check(self):
+        """
+        Checks user name for errors (use of reserved sheet name or empty submission)
+        Returns false to cause recursion if failure, true to allow program to proceed on success
+        """
+        try:
+            if self.name == "__template__":
+                raise ValueError(
+                    "'__template__' is a reserved user account. Enter a different name"
+                )
+            if self.name.strip() == "":
+                raise ValueError(
+                    "cannot accept an empty entry"
+                )
+        except ValueError as e:
+            self.scr.addstr(12, 0, f"\tInvalid entry: {e}, please try again (any key to continue)")
+            self.scr.move(14, 8)
+            self.scr.getch()
+            return False
+
         return True
-    elif name not in worksheet_list:
-        return False
+
+    def response(self):
+        """
+        Displays the user input and prompts
+        """
+        self.scr.addstr(12, 0, f"\tWelcome {self.name.title()}!")
+        self.user = self.name.replace(" ", "")
+
+        if self.check_for_user():
+            self.scr.addstr(13, 0, ("\tYou have an active account with "
+                                    f"{len(SHEET.worksheet(self.user).get_all_values())-1} "
+                                    "entries. Access your library? (y/n)"))
+        else:
+            self.scr.addstr(13, 0, ("\tYou have not yet created an account. "
+                                    "Create a new account? (y/n)"))
+
+        self.scr.move(15, 8)
+
+    def user_control(self):
+        """
+        Allows user to use key inputs to decide what action to take
+        """
+        while True:
+            key = self.scr.getkey()
+            if key == "y":
+                if not self.check_for_user():
+                    #creates new sheet from template for user data
+                    SHEET.duplicate_sheet(0,new_sheet_name=self.user)
+                return
+            elif key == "n":
+                return self.render()
+
+    def render(self):
+        """
+        Displays the landing page on program start
+        Takes user's name as input to retrieve catalog or set up new one
+        Returns user's name in proper format
+        """
+        self.render_heading()
+        self.display_message()
+        self.name = self.user_input(10, 25)
+        if not self.error_check():
+            return self.render()
+        self.response()
+        self.user_control()
+
+        return self.name, self.user
 
 def display_landing(stdscr):
     """
@@ -78,52 +184,16 @@ def display_landing(stdscr):
     Takes user's name as input to retrieve catalog or set up new one
     Returns user's name in proper format
     """
-    render_heading(stdscr, "Great Library")
-    stdscr.addstr(7, 0, ("\tWelcome to the great library, a console-based catalog of all\n\tthe books you have read, "
-                        "and want to read!\n\n\tEnter your name: "))
+    landing = LandingUI(stdscr, "Great Library", ("\tWelcome to the great library,"
+                                                    "a console-based catalog of all\n"
+                                                    "\tthe books you have read, "
+                                                    "and want to read!\n\n\tEnter your name: "))
 
-    win = curses.newwin(1, curses.COLS-26, 10, 25)
-    box = Textbox(win)
-    stdscr.refresh()
-    box.edit()
-
-    #Try except is to prevent user from accessing a reserved sheet for templating all other sheets and entering an empty name
-    try:
-        name = box.gather().strip().lower()
-        if name == "__template__":
-            raise ValueError(
-                "'__template__' is a reserved user account. Enter a different name"
-            )
-        if name.strip() == "":
-            raise ValueError(
-                "cannot accept an empty entry"
-            )
-    except ValueError as e:
-        stdscr.addstr(11, 0, f"\tInvalid entry: {e}, please try again (any key to continue)")
-        stdscr.getch()
-        return display_landing(stdscr)
-
-    stdscr.addstr(12, 0, f"\tWelcome {name.title()}!")
-    name = name.replace(" ", "")
-
-    if check_for_user(name):
-        stdscr.addstr(13, 0, (f"\tYou have an active account with {len(SHEET.worksheet(name).get_all_values())-1} "
-                            "entries. Access your library? (y/n)\n\t"))
-    else:
-        stdscr.addstr(13, 0, "\tYou have not yet created an account. Create a new account? (y/n)")
-
-    stdscr.move(15, 8)
-
-    while True:
-        key = stdscr.getkey()
-        if key == "y":
-            if not check_for_user(name):
-                #creates new sheet from template for user data
-                SHEET.duplicate_sheet(0,new_sheet_name=name)
-                stdscr.getch()
-            return name
-        elif key == "n":
-            return display_landing(stdscr)
+    name, user = landing.render()
+    print(name)
+    print(user)
+    stdscr.getch()
+    return name, user
 
 def display_add_ui(stdscr, library):
     """
@@ -238,8 +308,8 @@ def main(stdscr):
     GREEN_AND_BLACK = curses.color_pair(1)
     stdscr.attron(GREEN_AND_BLACK)
     
-    name = display_landing(stdscr)
-    library = UserLibrary(name)
+    name, user = display_landing(stdscr)
+    library = UserLibrary(name, user)
     display_home(stdscr, library)
 
     #ECHO USER KEYSTROKES
