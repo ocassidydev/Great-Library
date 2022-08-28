@@ -12,6 +12,8 @@ from curses.textpad import Textbox, rectangle
 
 from datetime import datetime
 
+from textwrap import wrap
+
 #Plugging in APIs
 #DRIVE AND SHEET
 SCOPE = [
@@ -191,32 +193,53 @@ class AddUI(ConsoleUI):
     def search_ui(self):
         curses.resetty()
         self.results_win = curses.newwin(2, curses.COLS-9, 9, 8)
-        self.scr.addstr(12, 0, ("\tIs this the title you wish to add?\n"
-                                "\tEnter - confirm\n\tn - Next result\n"
-                                "\ts -  enter new search\n\tq - quit"))
-        self.scr.move(18, 8)
+        self.scr.addstr(12, 0, ("\tIs this the title you wish to add?\n\n"
+                                "\tEnter - confirm\n\tn - next result\n"
+                                "\tp - prev result\n\ts - enter new search"
+                                "\n\tq - quit"))
+        self.scr.move(20, 8)
 
-    def user_control(self):
+    def confirm_ui(self):
+        win = curses.newwin(curses.LINES-8, curses.COLS-9, 7, 8)
+
+        win.addstr((f"Title: {self.add_book.get('title', 'title not found')}\n"
+                    f"Author: {self.add_book.get('authors', 'author not found')[0]}\n"
+                    f"Pages: {self.add_book.get('pageCount', 'page count not found')}\n"
+                    "Genres: "+", ".join(self.add_book.get('categories', ['genres not found']))+"\n"
+                    f"Description: {self.add_book.get('description', 'description not found')}\n\n"
+                    "Are these details correct?\n\nEnter - confirm\ne - edit\nb - return to search\n"
+                    "q - quit\n\n"))
+        win.refresh()
+        self.scr.getch()
+
+    def main_user_control(self):
         i = 0 
-        prev_i = i
+        prev_i = -1
         while True:
             if i != prev_i:
                 self.results_win.clear()
-                self.results_win.addstr(f"{book_data['items'][i]['volumeInfo']['title']}"
-                                        f"\n{book_data['items'][i]['volumeInfo']['authors'][0]}"))
+                self.results_win.addstr(("Title: "
+                                        f"{self.book_data['items'][i]['volumeInfo'].get('title', 'title not found')}"
+                                        "\nAuthor: "
+                                        f"{self.book_data['items'][i]['volumeInfo'].get('authors','author not found')[0]}"))
                 self.results_win.refresh()
+                self.scr.move(20, 8)
                 prev_i == i
             key = self.scr.getkey()
 
             if key == "\n":
-                #self.library.add_book(book_data['items'][i]['volumeInfo'])
-                pass
+                self.add_book = self.book_data['items'][i]['volumeInfo']
+                self.confirm_ui()
             elif key == "n":
-                i += 1
+                if not i == len(self.book_data['items'])-1:
+                    i += 1
+            elif key == "p":
+                if not i == 0:
+                    i -= 1
+            elif key == "s":
+                return self.render()
             elif key == "q":
-                return self.library
-
-        stdscr.getch()
+                return
 
     def render(self):
         self.render_heading()
@@ -224,6 +247,8 @@ class AddUI(ConsoleUI):
         self.display_message()
         self.query = self.user_input(9, 8).replace(" ", "+")
         self.search()
+        self.search_ui()
+        self.main_user_control()
 
 class Time():
     """
@@ -232,13 +257,13 @@ class Time():
     def __init__(self):
         self.now = datetime.now()
 
-        hour = now.hour
+        hour = self.now.hour
         self.am_pm = "am" if hour < 12 else "pm"
         self.hour = 12 if hour == 0 else hour if hour <= 12 else hour - 12
         self.days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        self.day = now.day
+        self.day = self.now.day
         self.day_suffix = "st" if self.day%10 == 1 else "nd" if self.day%10 == 2 else "th"
-        self.month = now.strftime("%B")
+        self.month = self.now.strftime("%B")
 
 class HomeUI(ConsoleUI):
     """
@@ -261,7 +286,7 @@ class HomeUI(ConsoleUI):
         Allows user to use key inputs to decide what action to take
         """
         while True:
-            key = stdscr.getkey()
+            key = self.scr.getkey()
             if key == "a":
                 add = AddUI(self.scr, "Add book", "\tPlease enter the title of the book you wish to add:")
                 add.render()
@@ -292,7 +317,7 @@ class HomeUI(ConsoleUI):
         self.display_message()
         curses.savetty()
         self.display_controls("main")
-        self.user_control()
+        self.main_user_control()
 
         return
 
