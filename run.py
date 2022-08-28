@@ -184,11 +184,46 @@ class AddUI(ConsoleUI):
     def __init__(self, stdscr, heading, message):
         super().__init__(stdscr, heading, message)
 
+    def search(self):
+        resp = urlopen(f"{GBOOKS}{self.query}")
+        self.book_data = json.load(resp)
+
+    def search_ui(self):
+        curses.resetty()
+        self.results_win = curses.newwin(2, curses.COLS-9, 9, 8)
+        self.scr.addstr(12, 0, ("\tIs this the title you wish to add?\n"
+                                "\tEnter - confirm\n\tn - Next result\n"
+                                "\ts -  enter new search\n\tq - quit"))
+        self.scr.move(18, 8)
+
+    def user_control(self):
+        i = 0 
+        prev_i = i
+        while True:
+            if i != prev_i:
+                self.results_win.clear()
+                self.results_win.addstr(f"{book_data['items'][i]['volumeInfo']['title']}"
+                                        f"\n{book_data['items'][i]['volumeInfo']['authors'][0]}"))
+                self.results_win.refresh()
+                prev_i == i
+            key = self.scr.getkey()
+
+            if key == "\n":
+                #self.library.add_book(book_data['items'][i]['volumeInfo'])
+                pass
+            elif key == "n":
+                i += 1
+            elif key == "q":
+                return self.library
+
+        stdscr.getch()
+
     def render(self):
         self.render_heading()
         curses.savetty()
         self.display_message()
-        self.user_input()
+        self.query = self.user_input(9, 8).replace(" ", "+")
+        self.search()
 
 class Time():
     """
@@ -229,6 +264,7 @@ class HomeUI(ConsoleUI):
             key = stdscr.getkey()
             if key == "a":
                 add = AddUI(self.scr, "Add book", "\tPlease enter the title of the book you wish to add:")
+                add.render()
                 return self.render()
             elif key == "e":
                 pass
@@ -266,62 +302,14 @@ def display_landing(stdscr):
     Takes user's name as input to retrieve catalog or set up new one
     Returns user's name in proper format
     """
-    landing = LandingUI(stdscr, "Great Library", ("\tWelcome to the great library,"
-                                                    "a console-based catalog of all\n"
-                                                    "\tthe books you have read, "
-                                                    "and want to read!\n\n\tEnter your name: "))
+    landing = LandingUI(stdscr, "Great Library", 
+                        ("\tWelcome to the great library,"
+                        "a console-based catalog of all\n"
+                        "\tthe books you have read, "
+                        "and want to read!\n\n\tEnter your name: "))
 
     name, user = landing.render()
-    print(name)
-    print(user)
-    stdscr.getch()
-    return name, user
-
-def display_add_ui(stdscr, library):
-    """
-    Displays the interface for adding a new book
-    Takes user input to search for a book to add with google books API
-    Returns updated library on completion
-    """
-    render_heading(stdscr, "Add book")
-    curses.savetty()
-
-    stdscr.addstr(7, 0, "\tPlease enter the title of the book you wish to add:")
-    
-    win = curses.newwin(1, curses.COLS-9, 9, 8)
-    box = Textbox(win)
-    stdscr.refresh()
-    box.edit()
-
-    search = box.gather().strip().lower().replace(" ", "+")
-    resp = urlopen(f"{GBOOKS}{search}")
-    book_data = json.load(resp)
-
-    curses.resetty()
-    results_win = curses.newwin(2, curses.COLS-9, 9, 8)
-    stdscr.addstr(12, 0, "\tIs this the title you wish to add?\n\tEnter - confirm\n\tn - Next result\n\tq - quit")
-    stdscr.move(17, 8)
-
-    i = 0 
-    prev_i = i
-    while True:
-        if i != prev_i:
-            results_win.clear()
-            results_win.addstr(f"{book_data['items'][i]['volumeInfo']['title']}\n{book_data['items'][i]['volumeInfo']['authors'][0]}")
-            results_win.refresh()
-            prev_i == i
-        key = stdscr.getkey()
-
-        if key == "\n":
-            #library.add_book(book_data['items'][i]['volumeInfo'])
-            return library
-            pass
-        elif key == "n":
-            i += 1
-        elif key == "q":
-            return library
-
-    stdscr.getch()
+    return name, user    
 
 def display_home(stdscr, library):
     """
@@ -329,24 +317,13 @@ def display_home(stdscr, library):
     From here they can navigate to the other interfaces
     """
     time = Time()
-    home = HomeUI(stdscr, "Library Home", (f"\tWelcome, {library.name.title()}.\n\tThe time is currently "
-                                        f"{time.hour:02d}:{time.now.minute:02d} {time.am_pm}, "
-                                        f"{time.days[time.now.weekday()]} the {time.day}{time.day_suffix} of "
-                                        f"{time.month}, {time.now.year}.\n\n\tHow would you like to access "
-                                        "your library today?"))
+    home = HomeUI(stdscr, "Library Home", 
+                (f"\tWelcome, {library.name.title()}.\n\tThe time is currently "
+                f"{time.hour:02d}:{time.now.minute:02d} {time.am_pm}, "
+                f"{time.days[time.now.weekday()]} the {time.day}{time.day_suffix} of "
+                f"{time.month}, {time.now.year}.\n\n\tHow would you like to access "
+                "your library today?"))
     home.render()
-    
-    
-
-    
-
-#def display_edit_ui(stdscr, library)
-
-#def search_options(stdscr, controls, library)
-
-#def sort_options(stdscr, controls, library)
-
-#def display_book_list(stdscr, books):
 
 def main(stdscr):
     #CONFIGURE COLORS
