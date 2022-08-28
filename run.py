@@ -1,5 +1,4 @@
 #GOOGLE DRIVE/SHEETS API
-from time import strftime
 import gspread
 from google.oauth2.service_account import Credentials
 #GOOGLE BOOKS API
@@ -32,13 +31,6 @@ GBOOKS = "https://www.googleapis.com/books/v1/volumes?q=intitle:"
 #FIGLET
 F = Figlet()
 
-# search = input("What book are you looking for?\n")
-
-# resp = urlopen(f"{api}{search}")
-# book_data = json.load(resp)
-
-# print(book_data['items'][0]['volumeInfo'])
-
 class UserLibrary:
     """
     Stores the user's data as a list of dictionaries for displaying and editing
@@ -47,6 +39,11 @@ class UserLibrary:
     def __init__(self, name):
         self.name = name
         self.books = SHEET.worksheet(name).get_all_records()
+
+    # def add_book(self, data):
+    #     book_dict = {
+    #         "Name" = data[]
+    #     }
 
     #def sort(self, cat):
 
@@ -57,8 +54,11 @@ class UserLibrary:
     #def update_data(self):
 
 def render_heading(stdscr, heading):
+    """
+    Renders a figlet ASCII render of text at the top of the page
+    """
     stdscr.clear()
-    header = F.renderText(f"    {heading}")
+    header = F.renderText(f"       {heading}")
     stdscr.addstr(header)
 
 def check_for_user(name):
@@ -82,7 +82,7 @@ def display_landing(stdscr):
     stdscr.addstr(7, 0, ("\tWelcome to the great library, a console-based catalog of all\n\tthe books you have read, "
                         "and want to read!\n\n\tEnter your name: "))
 
-    win = curses.newwin(1, 20, 10, 25)
+    win = curses.newwin(1, curses.COLS-26, 10, 25)
     box = Textbox(win)
     stdscr.refresh()
     box.edit()
@@ -131,6 +131,45 @@ def display_add_ui(stdscr, library):
     Takes user input to search for a book to add with google books API
     Returns updated library on completion
     """
+    render_heading(stdscr, "Add book")
+    curses.savetty()
+
+    stdscr.addstr(7, 0, "\tPlease enter the title of the book you wish to add:")
+    
+    win = curses.newwin(1, curses.COLS-9, 9, 8)
+    box = Textbox(win)
+    stdscr.refresh()
+    box.edit()
+
+    search = box.gather().strip().lower().replace(" ", "+")
+    resp = urlopen(f"{GBOOKS}{search}")
+    book_data = json.load(resp)
+
+    curses.resetty()
+    results_win = curses.newwin(2, curses.COLS-9, 9, 8)
+    stdscr.addstr(12, 0, "\tIs this the title you wish to add?\n\tEnter - confirm\n\tn - Next result\n\tq - quit")
+    stdscr.move(17, 8)
+
+    i = 0 
+    prev_i = i
+    while True:
+        if i != prev_i:
+            results_win.clear()
+            results_win.addstr(f"{book_data['items'][i]['volumeInfo']['title']}\n{book_data['items'][i]['volumeInfo']['authors'][0]}")
+            results_win.refresh()
+            prev_i == i
+        key = stdscr.getkey()
+
+        if key == "\n":
+            #library.add_book(book_data['items'][i]['volumeInfo'])
+            return library
+            pass
+        elif key == "n":
+            i += 1
+        elif key == "q":
+            return library
+
+    stdscr.getch()
 
 
 def display_home(stdscr, library):
@@ -141,15 +180,19 @@ def display_home(stdscr, library):
     render_heading(stdscr, "Library Home")
 
     now = datetime.now()
+
     hour = now.hour
     am_pm = "am" if hour < 12 else "pm"
     hour = 12 if hour == 0 else hour if hour <= 12 else hour - 12
+
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
     day = now.day
     day_suffix = "st" if day%10 == 1 else "nd" if day%10 == 2 else "th"
+
     month = now.strftime("%B")
-    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     
-    stdscr.addstr(7, 0, (f"\tWelcome, {library.name.title()}.\n\tThe time is currently {hour}:{now.minute} {am_pm}, "
+    stdscr.addstr(7, 0, (f"\tWelcome, {library.name.title()}.\n\tThe time is currently {hour:02d}:{now.minute:02d} {am_pm}, "
                         f"{days[now.weekday()]} the {day}{day_suffix} of {month}, {now.year}.\n\n\tHow would you like "
                         "to access your library today?"))
     
