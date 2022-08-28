@@ -1,4 +1,5 @@
 #GOOGLE DRIVE/SHEETS API
+from time import strftime
 import gspread
 from google.oauth2.service_account import Credentials
 #GOOGLE BOOKS API
@@ -10,7 +11,7 @@ import curses
 from curses import wrapper
 from curses.textpad import Textbox, rectangle
 
-import time
+from datetime import datetime
 
 #Plugging in APIs
 #DRIVE AND SHEET
@@ -43,7 +44,7 @@ class UserLibrary:
     Stores the user's data as a list of dictionaries for displaying and editing
     Contains various methods for filtering, sorting, and displaying the library
     """
-    def __init__(name):
+    def __init__(self, name):
         self.name = name
         self.books = SHEET.worksheet(name).get_all_records()
 
@@ -97,13 +98,15 @@ def display_landing(stdscr):
         stdscr.getch()
         return display_landing(stdscr)
 
-    stdscr.addstr(11, 0, f"\tWelcome {name.title()}!")
+    stdscr.addstr(12, 0, f"\tWelcome {name.title()}!")
     name = name.replace(" ", "")
 
     if check_for_user(name):
-        stdscr.addstr(12, 0, f"\tYou have an active account with {len(SHEET.worksheet(name).get_all_values())-1} entries. Access your library? (y/n)")
+        stdscr.addstr(13, 0, f"\tYou have an active account with {len(SHEET.worksheet(name).get_all_values())-1} entries. Access your library? (y/n)\n\t")
     else:
-        stdscr.addstr(12, 0, "\tYou have not yet created an account. Create a new account? (y/n)")
+        stdscr.addstr(13, 0, "\tYou have not yet created an account. Create a new account? (y/n)")
+
+    stdscr.move(15, 8)
 
     while True:
         key = stdscr.getkey()
@@ -116,17 +119,63 @@ def display_landing(stdscr):
         elif key == "n":
             return display_landing(stdscr)
 
-# def display_home(stdscr, library):
-#     """
-#     Displays the user's home page
-#     From here they can navigate to the other interfaces
-#     """
+def display_home(stdscr, library):
+    """
+    Displays the user's home page
+    From here they can navigate to the other interfaces
+    """
+    stdscr.clear()
+    header = F.renderText("    Library Home")
+    stdscr.addstr(header)
+
+    now = datetime.now()
+    hour = now.hour
+    am_pm = "am" if hour < 12 else "pm"
+    hour = 12 if hour == 0 else hour if hour <= 12 else hour - 12
+    day = now.day
+    day_suffix = "st" if day%10 == 1 else "nd" if day%10 == 2 else "th"
+    month = now.strftime("%B")
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    
+    stdscr.addstr(7, 0, (f"\tWelcome, {library.name.title()}.\n\tThe time is currently {hour}:{now.minute} {am_pm}, "
+                        f"{days[now.weekday()]} the {day}{day_suffix} of {month}, {now.year}.\n\n\tHow would you like "
+                        "to access your library today?"))
+    
+    controls = curses.newwin(9, 32, 12, 8)
+    stdscr.refresh()
+    controls.addstr("a - add new title\ne - edit catalog\n\ns - search\no - sort catalog by\nb - browse entire catalog\n\nq - save and quit")
+    controls.refresh()
+    stdscr.move(21, 8)
+
+    while True:
+        key = stdscr.getkey()
+        if key == "a":
+            pass
+            #display_add_ui(stdscr, library)
+        elif key == "e":
+            pass
+            #display_edit_ui(stdscr, library)
+        elif key == "s":
+            pass
+            #search_options(stdscr, controls, library)
+        elif key == "o":
+            pass
+            #sort_options(stdscr, controls, library)
+        elif key == "b":
+            pass
+            #display_book_list(stdscr, library.books)
+        elif key == "q":
+            return
 
 #def display_add_ui(stdscr)
 
-#def display_book_list(stdscr, library):
-
 #def display_edit_ui(stdscr, library)
+
+#def search_options(stdscr, controls, library)
+
+#def sort_options(stdscr, controls, library)
+
+#def display_book_list(stdscr, books):
 
 def main(stdscr):
     #CONFIGURE COLORS
@@ -135,10 +184,8 @@ def main(stdscr):
     stdscr.attron(GREEN_AND_BLACK)
     
     name = display_landing(stdscr)
-    print(SHEET.worksheet(name).get_all_records())
-    stdscr.getch()
-
-    # library = UserLibrary(name)
+    library = UserLibrary(name)
+    display_home(stdscr, library)
 
     #ECHO USER KEYSTROKES
     #curses.echo()
