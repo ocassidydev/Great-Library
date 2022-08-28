@@ -191,30 +191,16 @@ class AddUI(ConsoleUI):
         self.book_data = json.load(resp)
 
     def search_ui(self):
-        curses.resetty()
         self.results_win = curses.newwin(2, curses.COLS-9, 9, 8)
         self.scr.addstr(12, 0, ("\tIs this the title you wish to add?\n\n"
                                 "\tEnter - confirm\n\tn - next result\n"
                                 "\tp - prev result\n\ts - enter new search"
-                                "\n\tq - quit"))
-        self.scr.move(20, 8)
-
-    def confirm_ui(self):
-        win = curses.newwin(curses.LINES-8, curses.COLS-9, 7, 8)
-
-        win.addstr((f"Title: {self.add_book.get('title', 'title not found')}\n"
-                    f"Author: {self.add_book.get('authors', 'author not found')[0]}\n"
-                    f"Pages: {self.add_book.get('pageCount', 'page count not found')}\n"
-                    "Genres: "+", ".join(self.add_book.get('categories', ['genres not found']))+"\n"
-                    f"Description: {self.add_book.get('description', 'description not found')}\n\n"
-                    "Are these details correct?\n\nEnter - confirm\ne - edit\nb - return to search\n"
-                    "q - quit\n\n"))
-        win.refresh()
-        self.scr.getch()
+                                "\n\tq - quit"))                      
 
     def main_user_control(self):
         i = 0 
         prev_i = -1
+
         while True:
             if i != prev_i:
                 self.results_win.clear()
@@ -241,9 +227,53 @@ class AddUI(ConsoleUI):
             elif key == "q":
                 return
 
+    def confirm_user_control(self):
+        """
+        Allows user to control what they want to do when they are viewing detailed book description
+        """
+        while True:
+            key = self.scr.getkey()
+            if key == "\n":
+                self.library.new_book(self.add_book)
+            elif key == "e":
+                #self.edit_ui()
+                pass
+            elif key == "b":
+                self.scr.clear()
+                self.render_heading()
+                self.display_message()
+                self.search_ui()
+                self.main_user_control()
+                return
+
+    def confirm_ui(self):
+        """
+        Brings up more detailed information about book before user confirms they wish to add it
+        """
+        self.win = curses.newwin(curses.LINES-8, curses.COLS-9, 7, 8)
+        self.display_win = curses.newwin(curses.LINES-8, curses.COLS - 22, 7, 21)
+
+        categories = ", ".join(self.add_book.get('categories', ['genres not found']))
+        #bug can be caused by book description being too long for console
+        #bug also if user hit ctrl+x
+        self.win.addstr(("Title: \n"
+                        "Author: \n"
+                        "Pages: \n"
+                        "Genres: \n"
+                        "Description: "))
+        self.display_win.addstr((f"{self.add_book.get('title', 'title not found')}\n"
+                                f"{self.add_book.get('authors', 'author not found')[0]}\n"
+                                f"{self.add_book.get('pageCount', 'page count not found')}\n"
+                                f"{categories}\n"
+                                f"{self.add_book.get('description', 'description not found')}\n\n"
+                                "Are these details correct?\n\nEnter - confirm\ne - edit\n"
+                                "b - return to search\nq - quit\n\n"))
+        self.win.refresh()
+        self.display_win.refresh()
+        self.confirm_user_control()
+
     def render(self):
         self.render_heading()
-        curses.savetty()
         self.display_message()
         self.query = self.user_input(9, 8).replace(" ", "+")
         self.search()

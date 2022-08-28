@@ -16,9 +16,4 @@
 #         f"{", ".join(add_book.get('categories', ['genres not found']))}"))
  
 
-string = "Hello"
-
-print(".".join(string.split(".")[:3]))
-
-        
-                          
+print(len("description: "))
