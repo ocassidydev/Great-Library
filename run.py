@@ -177,6 +177,19 @@ class LandingUI(ConsoleUI):
 
         return self.name, self.user
 
+class AddUI(ConsoleUI):
+    """
+    For displaying the add book UI to the user
+    """
+    def __init__(self, stdscr, heading, message):
+        super().__init__(stdscr, heading, message)
+
+    def render(self):
+        self.render_heading()
+        curses.savetty()
+        self.display_message()
+        self.user_input()
+
 class Time():
     """
     Class for storing the information on the time for calling in the home UI message
@@ -199,6 +212,40 @@ class HomeUI(ConsoleUI):
     def __init__(self, stdscr, heading, message):
         super().__init__(stdscr, heading, message)
 
+    def display_controls(self, type):
+        if type == "main":
+            controls = curses.newwin(9, 32, 12, 8)
+            self.scr.refresh()
+            controls.addstr(("a - add new title\ne - edit catalog\n\ns - search\no - sort catalog"
+                            " by\nb - browse entire catalog\n\nq - save and quit"))
+            controls.refresh()
+            self.scr.move(21, 8)
+
+    def main_user_control(self):
+        """
+        Allows user to use key inputs to decide what action to take
+        """
+        while True:
+            key = stdscr.getkey()
+            if key == "a":
+                add = AddUI(self.scr, "Add book", "\tPlease enter the title of the book you wish to add:")
+                return self.render()
+            elif key == "e":
+                pass
+                #display_edit_ui(stdscr, library)
+            elif key == "s":
+                pass
+                #search_options(stdscr, controls, library)
+            elif key == "o":
+                pass
+                #sort_options(stdscr, controls, library)
+            elif key == "b":
+                pass
+                #display_book_list(stdscr, library.books)
+            elif key == "q":
+                #library.save
+                return
+
     def render(self):
         """
         Displays the users home page on accessing or creating account
@@ -207,6 +254,11 @@ class HomeUI(ConsoleUI):
         """
         self.render_heading()
         self.display_message()
+        curses.savetty()
+        self.display_controls("main")
+        self.user_control()
+
+        return
 
 def display_landing(stdscr):
     """
@@ -284,33 +336,9 @@ def display_home(stdscr, library):
                                         "your library today?"))
     home.render()
     
-    controls = curses.newwin(9, 32, 12, 8)
-    stdscr.refresh()
-    controls.addstr(("a - add new title\ne - edit catalog\n\ns - search\no - sort catalog by\nb - browse entire catalog"
-                    "\n\nq - save and quit"))
-    controls.refresh()
-    stdscr.move(21, 8)
+    
 
-    while True:
-        key = stdscr.getkey()
-        if key == "a":
-            display_add_ui(stdscr, library)
-            return display_home(stdscr, library)
-        elif key == "e":
-            pass
-            #display_edit_ui(stdscr, library)
-        elif key == "s":
-            pass
-            #search_options(stdscr, controls, library)
-        elif key == "o":
-            pass
-            #sort_options(stdscr, controls, library)
-        elif key == "b":
-            pass
-            #display_book_list(stdscr, library.books)
-        elif key == "q":
-            save
-            return
+    
 
 #def display_edit_ui(stdscr, library)
 
