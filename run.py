@@ -90,7 +90,6 @@ class ConsoleUI:
 
         return box.gather().strip().lower()
 
-
 class LandingUI(ConsoleUI):
     """
     Class for landing page interface object
@@ -178,6 +177,37 @@ class LandingUI(ConsoleUI):
 
         return self.name, self.user
 
+class Time():
+    """
+    Class for storing the information on the time for calling in the home UI message
+    """
+    def __init__(self):
+        self.now = datetime.now()
+
+        hour = now.hour
+        self.am_pm = "am" if hour < 12 else "pm"
+        self.hour = 12 if hour == 0 else hour if hour <= 12 else hour - 12
+        self.days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        self.day = now.day
+        self.day_suffix = "st" if self.day%10 == 1 else "nd" if self.day%10 == 2 else "th"
+        self.month = now.strftime("%B")
+
+class HomeUI(ConsoleUI):
+    """
+    Class for user home interface object
+    """
+    def __init__(self, stdscr, heading, message):
+        super().__init__(stdscr, heading, message)
+
+    def render(self):
+        """
+        Displays the users home page on accessing or creating account
+        Provides options for which interface the user would like to access
+        Returns on user quitting
+        """
+        self.render_heading()
+        self.display_message()
+
 def display_landing(stdscr):
     """
     Displays the landing page on program start
@@ -241,30 +271,18 @@ def display_add_ui(stdscr, library):
 
     stdscr.getch()
 
-
 def display_home(stdscr, library):
     """
     Displays the user's home page
     From here they can navigate to the other interfaces
     """
-    render_heading(stdscr, "Library Home")
-
-    now = datetime.now()
-
-    hour = now.hour
-    am_pm = "am" if hour < 12 else "pm"
-    hour = 12 if hour == 0 else hour if hour <= 12 else hour - 12
-
-    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-
-    day = now.day
-    day_suffix = "st" if day%10 == 1 else "nd" if day%10 == 2 else "th"
-
-    month = now.strftime("%B")
-    
-    stdscr.addstr(7, 0, (f"\tWelcome, {library.name.title()}.\n\tThe time is currently {hour:02d}:{now.minute:02d} {am_pm}, "
-                        f"{days[now.weekday()]} the {day}{day_suffix} of {month}, {now.year}.\n\n\tHow would you like "
-                        "to access your library today?"))
+    time = Time()
+    home = HomeUI(stdscr, "Library Home", (f"\tWelcome, {library.name.title()}.\n\tThe time is currently "
+                                        f"{time.hour:02d}:{time.now.minute:02d} {time.am_pm}, "
+                                        f"{time.days[time.now.weekday()]} the {time.day}{time.day_suffix} of "
+                                        f"{time.month}, {time.now.year}.\n\n\tHow would you like to access "
+                                        "your library today?"))
+    home.render()
     
     controls = curses.newwin(9, 32, 12, 8)
     stdscr.refresh()
