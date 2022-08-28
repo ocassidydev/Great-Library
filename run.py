@@ -56,6 +56,11 @@ class UserLibrary:
 
     #def update_data(self):
 
+def render_heading(stdscr, heading):
+    stdscr.clear()
+    header = F.renderText(f"    {heading}")
+    stdscr.addstr(header)
+
 def check_for_user(name):
     """
     Checks the gsheet for the name entered on the landing page
@@ -71,11 +76,11 @@ def display_landing(stdscr):
     """
     Displays the landing page on program start
     Takes user's name as input to retrieve catalog or set up new one
+    Returns user's name in proper format
     """
-    stdscr.clear()
-    header = F.renderText("    Great Library")
-    stdscr.addstr(header)
-    stdscr.addstr(7, 0, "\tWelcome to the great library, a console-based catalog of all\n\tthe books you have read, and want to read!\n\n\tEnter your name: ")
+    render_heading(stdscr, "Great Library")
+    stdscr.addstr(7, 0, ("\tWelcome to the great library, a console-based catalog of all\n\tthe books you have read, "
+                        "and want to read!\n\n\tEnter your name: "))
 
     win = curses.newwin(1, 20, 10, 25)
     box = Textbox(win)
@@ -102,7 +107,8 @@ def display_landing(stdscr):
     name = name.replace(" ", "")
 
     if check_for_user(name):
-        stdscr.addstr(13, 0, f"\tYou have an active account with {len(SHEET.worksheet(name).get_all_values())-1} entries. Access your library? (y/n)\n\t")
+        stdscr.addstr(13, 0, (f"\tYou have an active account with {len(SHEET.worksheet(name).get_all_values())-1} "
+                            "entries. Access your library? (y/n)\n\t"))
     else:
         stdscr.addstr(13, 0, "\tYou have not yet created an account. Create a new account? (y/n)")
 
@@ -119,14 +125,20 @@ def display_landing(stdscr):
         elif key == "n":
             return display_landing(stdscr)
 
+def display_add_ui(stdscr, library):
+    """
+    Displays the interface for adding a new book
+    Takes user input to search for a book to add with google books API
+    Returns updated library on completion
+    """
+
+
 def display_home(stdscr, library):
     """
     Displays the user's home page
     From here they can navigate to the other interfaces
     """
-    stdscr.clear()
-    header = F.renderText("    Library Home")
-    stdscr.addstr(header)
+    render_heading(stdscr, "Library Home")
 
     now = datetime.now()
     hour = now.hour
@@ -143,15 +155,16 @@ def display_home(stdscr, library):
     
     controls = curses.newwin(9, 32, 12, 8)
     stdscr.refresh()
-    controls.addstr("a - add new title\ne - edit catalog\n\ns - search\no - sort catalog by\nb - browse entire catalog\n\nq - save and quit")
+    controls.addstr(("a - add new title\ne - edit catalog\n\ns - search\no - sort catalog by\nb - browse entire catalog"
+                    "\n\nq - save and quit"))
     controls.refresh()
     stdscr.move(21, 8)
 
     while True:
         key = stdscr.getkey()
         if key == "a":
-            pass
-            #display_add_ui(stdscr, library)
+            display_add_ui(stdscr, library)
+            return display_home(stdscr, library)
         elif key == "e":
             pass
             #display_edit_ui(stdscr, library)
@@ -165,9 +178,8 @@ def display_home(stdscr, library):
             pass
             #display_book_list(stdscr, library.books)
         elif key == "q":
+            save
             return
-
-#def display_add_ui(stdscr)
 
 #def display_edit_ui(stdscr, library)
 
