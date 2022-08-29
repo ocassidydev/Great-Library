@@ -11,6 +11,7 @@ from curses import wrapper
 from curses.textpad import Textbox, rectangle
 
 from datetime import datetime
+import math
 
 from textwrap import wrap
 
@@ -33,6 +34,18 @@ GBOOKS = "https://www.googleapis.com/books/v1/volumes?q=intitle:"
 #FIGLET
 F = Figlet()
 
+class Book:
+    def __init__(self, bookdata):
+        self.title = bookdata.get('title', 'title not found')
+        self.author = bookdata.get('authors', 'author not found')[0]
+        self.pages = bookdata.get('pageCount', 'page count not found')
+        
+        description = bookdata.get('description', 'description not found')
+        if len(description) >= 4*(curses.COLS - 22)-3:
+            description = description[:4*(curses.COLS - 22)-3] + "..."
+        self.description = description
+        self.categories = ", ".join(bookdata.get('categories', ['genres not found']))
+
 class UserLibrary:
     """
     Stores the user's data as a list of dictionaries for displaying and editing
@@ -43,7 +56,10 @@ class UserLibrary:
         self.user = user
         self.books = SHEET.worksheet(user).get_all_records()
 
-    # def add_book(self, data):
+    # def add_book(self, book, data):
+        """
+        Adds new book both to the data structure and the google sheet
+        """
     #     book_dict = {
     #         "Name" = data[]
     #     }
@@ -99,6 +115,7 @@ class ConsoleUI:
         self.render_heading()
         self.display_message()
 
+#Works
 class LandingUI(ConsoleUI):
     """
     Class for landing page interface object
@@ -188,6 +205,7 @@ class LandingUI(ConsoleUI):
 class AddUI(ConsoleUI):
     """
     For displaying the add book UI to the user
+    Initiated and called in home.main_user_control()
     """
     def __init__(self, stdscr, heading, message):
         super().__init__(stdscr, heading, message)
@@ -220,7 +238,7 @@ class AddUI(ConsoleUI):
             key = self.scr.getkey()
 
             if key == "\n":
-                self.add_book = self.book_data['items'][i]['volumeInfo']
+                self.add_book = Book(self.book_data['items'][i]['volumeInfo'])
                 self.confirm_ui()
             elif key == "n":
                 if not i == len(self.book_data['items'])-1:
@@ -240,10 +258,7 @@ class AddUI(ConsoleUI):
         while True:
             key = self.scr.getkey()
             if key == "\n":
-                self.library.new_book(self.add_book)
-            elif key == "e":
-                #self.edit_ui()
-                pass
+                return self.add_book()
             elif key == "b":
                 return self.render()
 
@@ -251,27 +266,46 @@ class AddUI(ConsoleUI):
         """
         Brings up more detailed information about book before user confirms they wish to add it
         """
-        self.win = curses.newwin(curses.LINES-8, curses.COLS-9, 7, 8)
-        self.display_win = curses.newwin(curses.LINES-8, curses.COLS - 22, 7, 21)
+        self.attr_win = curses.newwin(5, curses.COLS-9, 7, 8)
+        self.detail_win = curses.newwin(5, curses.COLS - 22, 7, 21)
 
-        categories = ", ".join(self.add_book.get('categories', ['genres not found']))
-        #bug can be caused by book description being too long for console
-        #bug also if user hit ctrl+x
-        self.win.addstr(("Title: \n"
+        #bug if user hit ctrl+x
+        self.attr_win.addstr(("Title: \n"
                         "Author: \n"
                         "Pages: \n"
                         "Genres: \n"
                         "Description: "))
-        self.display_win.addstr((f"{self.add_book.get('title', 'title not found')}\n"
-                                f"{self.add_book.get('authors', 'author not found')[0]}\n"
-                                f"{self.add_book.get('pageCount', 'page count not found')}\n"
-                                f"{categories}\n"
-                                f"{self.add_book.get('description', 'description not found')}\n\n"
-                                "Are these details correct?\n\nEnter - confirm\ne - edit\n"
-                                "b - return to search\nq - quit\n\n"))
-        self.win.refresh()
-        self.display_win.refresh()
+        self.detail_win.addstr((f"{self.add_book.title}\n"
+                                f"{self.add_book.author}\n"
+                                f"{self.add_book.pages}\n"
+                                f"{self.add_book.description}\n"
+                                f"{self.add_book.categories}\n"))
+        self.scr.addstr(17, 0, ("\tAre these details correct?\n\nEnter - confirm\n"
+                                "\tb - return to search\n\tq - quit"))
+        self.attr_win.refresh()
+        self.detail_win.refresh()
         self.confirm_user_control()
+
+    def add_book(self):
+        """
+        Allows user to input their data on the book and then store the data
+        """
+        self.scr.clear()
+        self.render_heading()
+        self.query_win = curses.newwin(1, curses.COLS - 9, 7, 8)
+        queries = ["How would you rate this book out of 5?",
+                ("Is this a book that you: want to read (w), are "
+                "currently reading(r), or have read(h)"),
+                "Do you own a physical copy? (y/n)",
+                "Do you own an audiobook of this book? (y/n)"]
+
+        inputs = []
+
+        for query in queries:
+            query_win.addstr(query)
+            query_win.refresh()
+            inputs.append(self.user_input(9, 8))
+            self.library.add_book(self.add_book)
 
     def render(self):
         super().render()
