@@ -239,12 +239,7 @@ class AddUI(ConsoleUI):
                 #self.edit_ui()
                 pass
             elif key == "b":
-                self.scr.clear()
-                self.render_heading()
-                self.display_message()
-                self.search_ui()
-                self.main_user_control()
-                return
+                return self.render()
 
     def confirm_ui(self):
         """
