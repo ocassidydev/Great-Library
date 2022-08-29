@@ -41,7 +41,7 @@ class UserLibrary:
     def __init__(self, name, user):
         self.name = name
         self.user = user
-        self.books = SHEET.worksheet(name).get_all_records()
+        self.books = SHEET.worksheet(user).get_all_records()
 
     # def add_book(self, data):
     #     book_dict = {
@@ -91,6 +91,13 @@ class ConsoleUI:
         box.edit()
 
         return box.gather().strip().lower()
+
+    def render(self):
+        """
+        Displays the heading and main message in each UI
+        """
+        self.render_heading()
+        self.display_message()
 
 class LandingUI(ConsoleUI):
     """
@@ -169,8 +176,7 @@ class LandingUI(ConsoleUI):
         Takes user's name as input to retrieve catalog or set up new one
         Returns user's name in proper format
         """
-        self.render_heading()
-        self.display_message()
+        super().render()
         self.name = self.user_input(10, 25)
         if not self.error_check():
             return self.render()
@@ -268,8 +274,7 @@ class AddUI(ConsoleUI):
         self.confirm_user_control()
 
     def render(self):
-        self.render_heading()
-        self.display_message()
+        super().render()
         self.query = self.user_input(9, 8).replace(" ", "+")
         self.search()
         self.search_ui()
@@ -338,9 +343,7 @@ class HomeUI(ConsoleUI):
         Provides options for which interface the user would like to access
         Returns on user quitting
         """
-        self.render_heading()
-        self.display_message()
-        curses.savetty()
+        super().render()
         self.display_controls("main")
         self.main_user_control()
 
