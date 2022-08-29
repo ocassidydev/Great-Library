@@ -35,16 +35,19 @@ GBOOKS = "https://www.googleapis.com/books/v1/volumes?q=intitle:"
 F = Figlet()
 
 class Book:
+    """
+    Stores book data for easier recall and use
+    """
     def __init__(self, bookdata):
         self.title = bookdata.get('title', 'title not found')
         self.author = bookdata.get('authors', 'author not found')[0]
         self.pages = bookdata.get('pageCount', 'page count not found')
-        
+        self.categories = ", ".join(bookdata.get('categories', ['genres not found']))
         description = bookdata.get('description', 'description not found')
         if len(description) >= 4*(curses.COLS - 22)-3:
             description = description[:4*(curses.COLS - 22)-3] + "..."
         self.description = description
-        self.categories = ", ".join(bookdata.get('categories', ['genres not found']))
+        
 
 class UserLibrary:
     """
@@ -54,16 +57,26 @@ class UserLibrary:
     def __init__(self, name, user):
         self.name = name
         self.user = user
-        self.books = SHEET.worksheet(user).get_all_records()
+        self.worksheet = SHEET.worksheet(user).get_all_records()
+        self.books = self.books.get_all_records()
 
-    # def add_book(self, book, data):
+    def add_book(self, book, input_data):
         """
-        Adds new book both to the data structure and the google sheet
+        Adds new book both to the data structure and the google sheet.
         """
-    #     book_dict = {
-    #         "Name" = data[]
-    #     }
+        book_dict = {}
+        book_dict["Title"] = book.title
+        book_dict["Author"] = book.author
+        book_dict["Pages"] = book.pages
+        book_dict["Genres"] = book.categories
 
+        attrs = ["Rating", "Status", "Own Physical", "Own Audiobook"]:
+        for attr, data in zip(attrs, input_data):
+            book_dict[attr] = data
+
+        self.books.append(book_dict)
+        self.worksheet(list(book_dict.values()))
+        
     #def sort(self, cat):
 
     #def filter(self, cat):
@@ -72,6 +85,7 @@ class UserLibrary:
 
     #def update_data(self):
 
+#Works
 class ConsoleUI:
     """
     Parent class of all interfaces in the program
@@ -204,11 +218,12 @@ class LandingUI(ConsoleUI):
 
 class AddUI(ConsoleUI):
     """
-    For displaying the add book UI to the user
+    For displaying the add book UI to the user.
     Initiated and called in home.main_user_control()
     """
-    def __init__(self, stdscr, heading, message):
+    def __init__(self, stdscr, heading, message, library):
         super().__init__(stdscr, heading, message)
+        self.library = library
 
     def search(self):
         resp = urlopen(f"{GBOOKS}{self.query}")
@@ -220,6 +235,38 @@ class AddUI(ConsoleUI):
                                 "\tEnter - confirm\n\tn - next result\n"
                                 "\tp - prev result\n\ts - enter new search"
                                 "\n\tq - quit"))                      
+
+    def add_book(self):
+        """
+        Allows user to input their data on the book and then store the data
+        """
+        self.scr.clear()
+        self.render_heading()
+        query_win = curses.newwin(1, curses.COLS - 9, 7, 8)
+        queries = ["How would you rate this book out of 5?",
+                ("Is this a book that you: want to read (w), are "
+                "currently reading(r), or have read(h)"),
+                "Do you own a physical copy? (y/n)",
+                "Do you own an audiobook of this book? (y/n)"]
+
+        inputs = []
+
+        for query in queries:
+            query_win.clear()
+            query_win.addstr(query)
+            query_win.refresh()
+            inputs.append(self.user_input(9, 8))
+            self.library.add_book(self.add_book)
+
+        query_win.clear()
+        query_win.addstr("Adding book to library...")
+        query_win.refresh()
+        self.library.add_book(self.add_book)
+        query_win.clear()
+        query_win.addstr("Added book! Press any key to return to homepage.")
+        query_win.refresh()
+        self.scr.getch()
+        return
 
     def main_user_control(self):
         i = 0 
@@ -235,11 +282,11 @@ class AddUI(ConsoleUI):
                 self.results_win.refresh()
                 self.scr.move(20, 8)
                 prev_i == i
+            
             key = self.scr.getkey()
-
             if key == "\n":
                 self.add_book = Book(self.book_data['items'][i]['volumeInfo'])
-                self.confirm_ui()
+                return self.confirm_ui()
             elif key == "n":
                 if not i == len(self.book_data['items'])-1:
                     i += 1
@@ -264,10 +311,11 @@ class AddUI(ConsoleUI):
 
     def confirm_ui(self):
         """
-        Brings up more detailed information about book before user confirms they wish to add it
+        Brings up more detailed information about book before user confirms
+        they wish to add it.
         """
-        self.attr_win = curses.newwin(5, curses.COLS-9, 7, 8)
-        self.detail_win = curses.newwin(5, curses.COLS - 22, 7, 21)
+        self.attr_win = curses.newwin(5, curses.COLS-9, 5, 8)
+        self.detail_win = curses.newwin(5, curses.COLS - 22, 8, 21)
 
         #bug if user hit ctrl+x
         self.attr_win.addstr(("Title: \n"
@@ -278,34 +326,13 @@ class AddUI(ConsoleUI):
         self.detail_win.addstr((f"{self.add_book.title}\n"
                                 f"{self.add_book.author}\n"
                                 f"{self.add_book.pages}\n"
-                                f"{self.add_book.description}\n"
-                                f"{self.add_book.categories}\n"))
+                                f"{self.add_book.categories}\n"
+                                f"{self.add_book.description}"))
         self.scr.addstr(17, 0, ("\tAre these details correct?\n\nEnter - confirm\n"
                                 "\tb - return to search\n\tq - quit"))
         self.attr_win.refresh()
         self.detail_win.refresh()
-        self.confirm_user_control()
-
-    def add_book(self):
-        """
-        Allows user to input their data on the book and then store the data
-        """
-        self.scr.clear()
-        self.render_heading()
-        self.query_win = curses.newwin(1, curses.COLS - 9, 7, 8)
-        queries = ["How would you rate this book out of 5?",
-                ("Is this a book that you: want to read (w), are "
-                "currently reading(r), or have read(h)"),
-                "Do you own a physical copy? (y/n)",
-                "Do you own an audiobook of this book? (y/n)"]
-
-        inputs = []
-
-        for query in queries:
-            query_win.addstr(query)
-            query_win.refresh()
-            inputs.append(self.user_input(9, 8))
-            self.library.add_book(self.add_book)
+        return self.confirm_user_control()
 
     def render(self):
         super().render()
@@ -313,6 +340,15 @@ class AddUI(ConsoleUI):
         self.search()
         self.search_ui()
         self.main_user_control()
+        return
+
+#class EditUI(ConsoleUI):
+
+#class SearchUI(ConsoleUI):
+
+#Class SortUI(ConsoleUI):
+
+#class BrowseUI(ConsoleUI):
 
 class Time():
     """
@@ -334,14 +370,16 @@ class HomeUI(ConsoleUI):
     Class for user home interface object
     """
     def __init__(self, stdscr, heading, message):
-        super().__init__(stdscr, heading, message)
+        super().__init__(stdscr, heading, message, library)
 
     def display_controls(self, type):
         if type == "main":
             controls = curses.newwin(9, 32, 12, 8)
             self.scr.refresh()
-            controls.addstr(("a - add new title\ne - edit catalog\n\ns - search\no - sort catalog"
-                            " by\nb - browse entire catalog\n\nq - save and quit"))
+            controls.addstr(("a - add new title\ne - edit catalog"
+                            "\n\ns - search\no - sort catalog by"
+                            "\nb - browse entire catalog\n\n"
+                            "q - save and quit"))
             controls.refresh()
             self.scr.move(21, 8)
 
@@ -352,21 +390,30 @@ class HomeUI(ConsoleUI):
         while True:
             key = self.scr.getkey()
             if key == "a":
-                add = AddUI(self.scr, "Add book", "\tPlease enter the title of the book you wish to add:")
+                add = AddUI(self.scr, "Add book", ("\tPlease enter the title"
+                            " of the book you wish to add:"), self.library)
                 add.render()
                 return self.render()
             elif key == "e":
                 pass
-                #display_edit_ui(stdscr, library)
+                #edit = EditUI(self.scr, "", "", self.library)
+                #edit.render()
+                #return self.render()
             elif key == "s":
                 pass
-                #search_options(stdscr, controls, library)
+                #search = SearchUI(self.scr, "", "", self.library)
+                #search.render()
+                #return self.render()
             elif key == "o":
                 pass
-                #sort_options(stdscr, controls, library)
+                #sort = SortUI(self.scr, "", "", self.library)
+                #sort.render()
+                #return self.render()
             elif key == "b":
                 pass
-                #display_book_list(stdscr, library.books)
+                #browse = BrowseUI(self.scr, "", "", self.library)
+                #browse.render()
+                #return self.render()
             elif key == "q":
                 #library.save
                 return
@@ -409,7 +456,7 @@ def display_home(stdscr, library):
                 f"{time.hour:02d}:{time.now.minute:02d} {time.am_pm}, "
                 f"{time.days[time.now.weekday()]} the {time.day}{time.day_suffix} of "
                 f"{time.month}, {time.now.year}.\n\n\tHow would you like to access "
-                "your library today?"))
+                "your library today?"), library)
     home.render()
 
 def main(stdscr):
