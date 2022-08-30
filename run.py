@@ -106,7 +106,7 @@ class UserLibrary:
         to a library sorted by the input category.
         """
         if cat == "Title":
-            # avoids soft copying
+            # avoids soft copying and counting 'The' in alphabetization
             sort_attrs = [book[cat].replace("The ", "") for book in self.books]
             sort_attrs.sort()
             attrs = [book[cat].replace("The ", "") for book in self.books]
@@ -152,7 +152,7 @@ class DisplayBookMixin():
     """
     queries = ["","How would you rate this book out of 5? Hit enter if n/a.",
                 ("Is this a book that you: want to read (w), are "
-                "currently reading (r), or have finished (f)?"),
+                "currently reading (r),\n or have finished (f)?"),
                 "Do you own a physical copy? (y/n)",
                 "Do you own an audiobook of this book? (y/n)", ""]
 
@@ -185,7 +185,10 @@ class DisplayBookMixin():
         self.inputs = []
         for query in self.queries:
             self.refresh_win(self.query_win, query)
-            self.scr.move(11, 8)
+            if "finished (f)?" in query:
+                self.scr.move(12, 8)
+            else:
+                self.scr.move(11, 8)
 
             if query == "":
                 continue
@@ -314,8 +317,8 @@ class LandingUI(ConsoleUI):
                     "cannot accept an empty entry"
                 )
         except ValueError as e:
-            self.scr.addstr(12, 0, f"\tInvalid entry: {e}, please try again (any key to continue)")
-            self.scr.move(14, 8)
+            self.scr.addstr(12, 0, f"\tInvalid entry: {e}, please try again (any key \n\tto continue)")
+            self.scr.move(15, 8)
             self.scr.getch()
             return False
 
@@ -640,35 +643,6 @@ class HomeUI(ConsoleUI):
         elif type == "filter":
             self.panel(5, 34, self.filter_control)
 
-    def search_user_control(self):
-        """
-        Allows user to use key inputs to decide what action to take
-        """
-        while True:
-            key = self.scr.getkey()
-            if key == "b":
-                browse = BrowseUI(self.scr, "Library browse", "", self.library)
-                browse.render()
-                return self.render()
-            elif key == "a":
-                add = AddUI(self.scr, "Add book", ("\tPlease enter the title"
-                            " of the book you wish to add:"), self.library)
-                add.render()
-                return self.render()
-            elif key == "s":
-                self.refresh_win(self.controls, "")
-                self.display_controls("search")
-                return self.render()
-            elif key == "o":
-                self.refresh_win(self.controls, "")
-                self.display_controls("sort")
-                return self.render()
-            elif key == "f":
-                self.refresh_win(self. controls, "")
-                self.display_
-            elif key == "q":
-                return
-
     def sort(self, sortstring):
         """
         Refactor to avoid repetition in sort_user_control
@@ -763,7 +737,7 @@ class HomeUI(ConsoleUI):
         self.refresh_win(self.controls, "")
         self.panel(2, 51, ("(Note: mispelled searches will not return results)\n"
                         "Enter your search terms:"))
-        search = self.user_input(13, 34)
+        search = self.user_input(13, 33)
         searched_library = self.library.search(self.category, search)
 
         # Handles case where no results of search query
