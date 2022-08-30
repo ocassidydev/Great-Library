@@ -51,7 +51,7 @@ class Book:
             description = bookdata.get('description', 'description not found').split(" ")
             description_string = ""
             j = 0
-            for i in range(5):
+            for i in range(4):
                 line_string = ""
                 while len(f"{line_string}{description[j]} ") <= (curses.COLS - 21):
                     if j > len(description):
@@ -64,9 +64,9 @@ class Book:
                     description_string += "\n"
                 if j > len(description):
                     break
-            
-            if len(description_string) >= 4*(curses.COLS - 22)-6:
-                description_string = description_string[:-3] + "..."
+
+            if i == 3 and len(line_string) >= curses.COLS - 32:
+                description_string = " ".join(description_string.split(" ")[:-3]) + "..."
             
             self.description = description_string
         
@@ -172,7 +172,7 @@ class DisplayBookMixin():
     """
     queries = ["","How would you rate this book out of 5? Hit enter if n/a.",
                 ("Is this a book that you: want to read (w), are "
-                "currently reading (r),\n or have finished (f)?"),
+                "currently reading (r),\nor have finished (f)?"),
                 "Do you own a physical copy? (y/n)",
                 "Do you own an audiobook of this book? (y/n)", ""]
 
@@ -586,10 +586,6 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
 
     def render(self):
         super().render()
-        if not self.libary.books:
-            self.scr.addstr(7, 8, "No books! Any key to go back to home.")
-            self.scr.getch()
-            return
         self.scr.addstr(21, 8, "arrow right/left - navigate entries\te - edit entry\tq - quit")
         self.scroll_books()
         return
@@ -659,7 +655,10 @@ class HomeUI(ConsoleUI):
         Displays the different types of controls to the main panel.
         """
         if type == "main":
-            self.panel(8, 20, self.main_control)
+            if len(self.library.books):
+                self.panel(8, 20, self.main_control)
+            else:
+                self.panel(3, 13, "a - add book\n\nq - quit")
         elif type == "search":
             self.panel(6, 21, self.search_control)
         elif type == "sort":
@@ -808,26 +807,27 @@ class HomeUI(ConsoleUI):
         """
         while True:
             key = self.scr.getkey()
-            if key == "b":
-                browse = BrowseUI(self.scr, "Library browse", "", self.library)
-                browse.render()
-                return self.render()
-            elif key == "a": 
+            if len(self.library.books) != 0:
+                if key == "b":
+                    browse = BrowseUI(self.scr, "Library browse", "", self.library)
+                    browse.render()
+                    return self.render()
+                elif key == "s":
+                    self.change_main_panel("search")
+                    self.search_user_control()
+                    return self.render()
+                elif key == "o":
+                    self.change_main_panel("sort")
+                    self.sort_user_control()
+                    return self.render()
+                elif key == "f":
+                    self.change_main_panel("filter")
+                    self.filter_user_control()
+                    return self.render()
+            if key == "a": 
                 add = AddUI(self.scr, "Add book", ("\tPlease enter the title"
                             " of the book you wish to add:"), self.library)
                 add.render()
-                return self.render()
-            elif key == "s":
-                self.change_main_panel("search")
-                self.search_user_control()
-                return self.render()
-            elif key == "o":
-                self.change_main_panel("sort")
-                self.sort_user_control()
-                return self.render()
-            elif key == "f":
-                self.change_main_panel("filter")
-                self.filter_user_control()
                 return self.render()
             elif key == "q":
                 return
