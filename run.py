@@ -46,10 +46,30 @@ class Book:
             self.author = bookdata.get('authors', 'author not found')[0]
             self.pages = bookdata.get('pageCount', 'page count not found')
             self.categories = ", ".join(bookdata.get('categories', ['genres not found']))
-            description = bookdata.get('description', 'description not found')
-            if len(description) >= 4*(curses.COLS - 22)-3:
-                description = description[:4*(curses.COLS - 22)-3] + "..."
-            self.description = description
+            
+            # Adds description subtended so it fits and displays properly on screen
+            description = bookdata.get('description', 'description not found').split(" ")
+            description_string = ""
+            j = 0
+            for i in range(5):
+                line_string = ""
+                while len(f"{line_string}{description[j]} ") <= (curses.COLS - 21):
+                    if j > len(description):
+                        break
+                    line_string += f"{description[j]} "
+                    j += 1
+            
+                description_string += line_string
+                if i != 4:
+                    description_string += "\n"
+                if j > len(description):
+                    break
+            
+            if len(description_string) >= 4*(curses.COLS - 22)-6:
+                description_string = description_string[:-3] + "..."
+            
+            self.description = description_string
+        
         else:
             self.title = bookdata["Title"]
             self.author = bookdata["Author"]
@@ -566,6 +586,10 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
 
     def render(self):
         super().render()
+        if not self.libary.books:
+            self.scr.addstr(7, 8, "No books! Any key to go back to home.")
+            self.scr.getch()
+            return
         self.scr.addstr(21, 8, "arrow right/left - navigate entries\te - edit entry\tq - quit")
         self.scroll_books()
         return
