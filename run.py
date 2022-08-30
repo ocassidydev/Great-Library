@@ -121,6 +121,7 @@ class DisplayBookMixin():
     def display_book(self, book):
         self.attr_win = curses.newwin(13, curses.COLS-9, 7, 8)
         self.detail_win = curses.newwin(13, curses.COLS - 22, 7, 21)
+        self.scr.refresh()
 
         self.refresh_win(self.attr_win, ("Title: \n"
                                     "Author: \n"
@@ -531,8 +532,19 @@ class HomeUI(ConsoleUI):
         self.main_control = ("b - browse and edit\na - add book"
                             "\n\ns - search book\no - sort books by\n\n"
                             "q - save and quit")
+        self.sort_control = ("t - sort by title\na - sort by author\n"
+                            "p - sort by pages\ng - sort by genres\n"
+                            "r - sort by rating\n\ns - filter by read"
+                            " status\no - filter by physical ownership"
+                            "\na - filter by audiobook ownership\n\n"
+                            "q - quit")
 
     def update_time(self):
+        """
+        Updates the main message on the home screen each time
+        it is rendered so the time stays accurate each time the
+        home is rendered.
+        """
         time = Time()
         self.message = (f"\tWelcome, {self.library.name.title()}.\n\tThe time is currently "
                         f"{time.hour:02d}:{time.now.minute:02d} {time.am_pm}, "
@@ -540,12 +552,27 @@ class HomeUI(ConsoleUI):
                         f"{time.month}, {time.now.year}.\n\n\tHow would you like to access "
                         "your library today?")
 
+    def panel(self, lines, cols, string):
+        """
+        Creates the panel of user controls based on user input
+        """
+        x, y = 8, 12
+        controls = curses.newwin(lines, cols, y, x)
+        self.scr.refresh()
+        self.refresh_win(controls, string)
+        self.scr.move(y + lines + 1, x)
+
     def display_controls(self, type):
+        """
+        Displays the different types of controls to the main panel.
+        """
         if type == "main":
-            controls = curses.newwin(9, 32, 12, 8)
-            self.scr.refresh()
-            self.refresh_win(controls, self.main_control)
-            self.scr.move(21, 8)
+            self.panel(7, 20, self.main_control)
+        elif type == "sort":
+            self.panel(12, 33, self.sort_control)
+            self.scr.getch()
+        elif type == "search":
+            pass
 
     def main_user_control(self):
         """
@@ -568,7 +595,7 @@ class HomeUI(ConsoleUI):
                 #search.render()
                 #return self.render()
             elif key == "o":
-                pass
+                self.display_controls("sort")
                 #sort = display_controls()
                 #sort.render()
                 #return self.render()
@@ -577,9 +604,9 @@ class HomeUI(ConsoleUI):
 
     def render(self):
         """
-        Displays the users home page on accessing or creating account
-        Provides options for which interface the user would like to access
-        Returns on user quitting
+        Displays the users home page on accessing or creating account.
+        Provides options for which interface the user would like to access.
+        Returns on user quitting.
         """
         self.update_time()
         super().render()
