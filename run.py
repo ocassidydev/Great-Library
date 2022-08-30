@@ -1,10 +1,10 @@
-#GOOGLE DRIVE/SHEETS API
+# GOOGLE DRIVE/SHEETS API
 import gspread
 from google.oauth2.service_account import Credentials
-#GOOGLE BOOKS API
+# GOOGLE BOOKS API
 from urllib.request import urlopen
 import json
-#CONSOLE TOOLS
+# CONSOLE TOOLS
 from pyfiglet import Figlet
 import curses
 from curses import wrapper
@@ -15,8 +15,8 @@ import math
 
 from textwrap import wrap
 
-#Plugging in APIs
-#DRIVE AND SHEET
+# Plugging in APIs
+# DRIVE AND SHEET
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",
@@ -28,10 +28,10 @@ SCOPED_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
 SHEET = GSPREAD_CLIENT.open('great_library')
 
-#GOOGLE BOOKS
+# GOOGLE BOOKS
 GBOOKS = "https://www.googleapis.com/books/v1/volumes?q=intitle:"
 
-#FIGLET
+# FIGLET
 F = Figlet()
 
 class Book:
@@ -60,6 +60,7 @@ class Book:
             self.status = bookdata["Status"]
             self.ownphys = bookdata["Own Physical"]
             self.ownaud = bookdata["Own Audiobook"]
+
 
 class UserLibrary:
     """
@@ -134,7 +135,7 @@ class UserLibrary:
 
         return searched_books    
 
-# Works
+
 class DisplayBookMixin():
     """
     Mixin for a commonly used method of displaying information on the book 
@@ -212,7 +213,6 @@ class DisplayBookMixin():
                         break
 
 
-# Works
 class ConsoleUI:
     """
     Parent class of all interfaces in the program
@@ -272,7 +272,6 @@ class ConsoleUI:
         self.display_message()
 
 
-# Works
 class LandingUI(ConsoleUI):
     """
     Class for landing page interface object
@@ -360,7 +359,6 @@ class LandingUI(ConsoleUI):
         return self.name, self.user
 
 
-# Works
 class AddUI(DisplayBookMixin, ConsoleUI):
     """
     For displaying the add book UI to the user.
@@ -392,11 +390,19 @@ class AddUI(DisplayBookMixin, ConsoleUI):
         self.user_entry_input()
         
         self.refresh_win(self.query_win, "Adding book to library...")
-        self.library.add_book(self.add_book, self.inputs)
-        self.refresh_win(self.query_win, "Added book! Press any key to return to homepage.")
+        # Checks if book is already in user's library
+        if self.add_book.title in [book["Title"] for book in self.library.books]:
+            self.refresh_win(self.query_win, f"{self.add_book.title} is already in your library!"
+                                            "Press any key to return to add book interface.")
+            
+            self.scr.getch()
+            return self.render()
+        else:
+            self.library.add_book(self.add_book, self.inputs)
+            self.refresh_win(self.query_win, "Added book! Press any key to return to homepage.")
 
-        self.scr.getch()
-        return
+            self.scr.getch()
+            return
 
     def main_user_control(self):
         i = 0 
@@ -512,7 +518,6 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
         self.detail_win.refresh()
         return
 
-    #Bug - won't display unless keypress at least once
     def scroll_books(self):
         """
         Displays book information from the library to the screen and allows
@@ -950,5 +955,7 @@ def main(stdscr):
     #     stdscr.addstr(y, x, "0")
     #     stdscr.refresh()
 
-
-wrapper(main)
+try:
+    wrapper(main)
+except Exception, err:
+    print(f"Program failed, error: {str(err)}. Click 'run program' to restart")
