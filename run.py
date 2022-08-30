@@ -124,7 +124,17 @@ class UserLibrary:
         filtered_books = [book for book in self.books if book[cat] == filter]
         return filtered_books
 
-#Works
+    def search(self, cat, search):
+        search = search.replace(" ", "+")
+        searched_books = []
+        for book in self.books:
+            term = book[cat].strip().lower().replace(" ", "+")
+            if search in term:
+                searched_books.append(book)
+
+        return searched_books    
+
+# Works
 class DisplayBookMixin():
     """
     Mixin for a commonly used method of displaying information on the book 
@@ -201,7 +211,8 @@ class DisplayBookMixin():
                         self.inputs.append("No")
                         break
 
-#Works
+
+# Works
 class ConsoleUI:
     """
     Parent class of all interfaces in the program
@@ -260,7 +271,8 @@ class ConsoleUI:
         self.render_heading()
         self.display_message()
 
-#Works
+
+# Works
 class LandingUI(ConsoleUI):
     """
     Class for landing page interface object
@@ -347,7 +359,8 @@ class LandingUI(ConsoleUI):
 
         return self.name, self.user
 
-#Works
+
+# Works
 class AddUI(DisplayBookMixin, ConsoleUI):
     """
     For displaying the add book UI to the user.
@@ -448,6 +461,7 @@ class AddUI(DisplayBookMixin, ConsoleUI):
         self.main_user_control()
         return
 
+
 class BrowseUI(DisplayBookMixin, ConsoleUI):
     def __init__(self, stdscr, heading, message, library, ordered_library=None, category=None, filter_opt=None):
         super().__init__(stdscr, heading, message)
@@ -460,7 +474,7 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
         """
         Allows user to input their new data on the book and then store the data
         """
-        if self.ordered_library != None:
+        if self.ordered_library:
             i = self.library.books.index(self.ordered_library[i])
 
         self.clear_page()
@@ -731,10 +745,14 @@ class HomeUI(ConsoleUI):
         """
         Takes users search term, call
         """
+        self.refresh_win(self.controls, "")
         self.panel(2, 51, ("(Note: mispelled searches will not return results)\n"
                         "Enter your search terms:"))
-        search = self.user_input(13, 26)
+        search = self.user_input(13, 34)
         searched_library = self.library.search(self.category, search)
+        if len(searched_library) == 0:
+            self.refresh_win(self.controls, "")
+            self.scr.addstr(7, 0, "\tNo Results found\nPress any key to try another search")
         browse = BrowseUI(self.scr, "Search", "", self.library, searched_library)
         return browse.render()
 
@@ -744,7 +762,7 @@ class HomeUI(ConsoleUI):
         which category user wishes to search
         """
         while True:
-            key = self.getkey()
+            key = self.scr.getkey()
             if key == "t":
                 self.category = "Title"
                 return self.search()
