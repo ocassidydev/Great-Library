@@ -422,7 +422,8 @@ class AddUI(DisplayBookMixin, ConsoleUI):
 
 #Class SortUI(ConsoleUI):
 
-#class BrowseUI(ConsoleUI):
+# class BrowseUI(DisplayBookMixin, ConsoleUI):
+#     def __init__(self, stdscr, heading, message, library):
 
 class Time():
     """
@@ -450,6 +451,14 @@ class HomeUI(ConsoleUI):
                             "\n\ns - search\no - sort catalog by"
                             "\nb - browse entire catalog\n\n"
                             "q - save and quit")
+
+    def update_time(self):
+        time = Time()
+        self.message = (f"\tWelcome, {self.library.name.title()}.\n\tThe time is currently "
+                        f"{time.hour:02d}:{time.now.minute:02d} {time.am_pm}, "
+                        f"{time.days[time.now.weekday()]} the {time.day}{time.day_suffix} of "
+                        f"{time.month}, {time.now.year}.\n\n\tHow would you like to access "
+                        "your library today?")
 
     def display_controls(self, type):
         if type == "main":
@@ -485,10 +494,9 @@ class HomeUI(ConsoleUI):
                 #sort.render()
                 #return self.render()
             elif key == "b":
-                pass
-                #browse = BrowseUI(self.scr, "", "", self.library)
-                #browse.render()
-                #return self.render()
+                browse = BrowseUI(self.scr, "", "", self.library)
+                browse.render()
+                return self.render()
             elif key == "q":
                 return
 
@@ -498,6 +506,7 @@ class HomeUI(ConsoleUI):
         Provides options for which interface the user would like to access
         Returns on user quitting
         """
+        self.update_time()
         super().render()
         self.display_controls("main")
         self.main_user_control()
@@ -524,13 +533,7 @@ def display_home(stdscr, library):
     Displays the user's home page
     From here they can navigate to the other interfaces
     """
-    time = Time()
-    home = HomeUI(stdscr, "Library Home", 
-                (f"\tWelcome, {library.name.title()}.\n\tThe time is currently "
-                f"{time.hour:02d}:{time.now.minute:02d} {time.am_pm}, "
-                f"{time.days[time.now.weekday()]} the {time.day}{time.day_suffix} of "
-                f"{time.month}, {time.now.year}.\n\n\tHow would you like to access "
-                "your library today?"), library)
+    home = HomeUI(stdscr, "Library Home", "", library)
     home.render()
 
 def main(stdscr):
