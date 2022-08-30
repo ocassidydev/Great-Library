@@ -615,6 +615,15 @@ class HomeUI(ConsoleUI):
             elif key == "q":
                 return
 
+    def sort(self, sortstring):
+        """
+        Refactor to avoid repetition in sort_user_control
+        """
+        sort_library = self.library.sort(sortstring)
+        browse = BrowseUI(self.scr, f"Browse by {sortstring}", "", self.library, sort_library)
+        browse.render()
+        return self.render()
+
     def sort_user_control(self):
         """
         Allows user to use key inputs to decide how they want to sort library.
@@ -622,21 +631,13 @@ class HomeUI(ConsoleUI):
         while True:
             key = self.scr.getkey()
             if key == "t":
-                sort_library = self.library.sort("title")
-                browse = BrowseUI(self.scr, "Browse by title", "", self.library, sort_library)
-                browse.render()
-                return self.render()
+                return self.sort("title")
             elif key == "a":
-                sort_library = self.library.sort("author")
-                browse = BrowseUI(self.scr, "Library browse", "", self.library, sort_library)
-                browse.render()
-                return self.render()
+                return self.sort("author")
             elif key == "p":
-                
-                return self.render()
+                return self.sort("pages")
             elif key == "g":
-                
-                return self.render()
+                return self.sort("genre")
             elif key == "q":
                 return
     
