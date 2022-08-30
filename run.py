@@ -11,7 +11,6 @@ from curses import wrapper
 from curses.textpad import Textbox, rectangle
 
 from datetime import datetime
-import math
 
 from textwrap import wrap
 
@@ -33,6 +32,7 @@ GBOOKS = "https://www.googleapis.com/books/v1/volumes?q=intitle:"
 
 # FIGLET
 F = Figlet()
+
 
 class Book:
     """
@@ -558,7 +558,7 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
         self.scroll_books()
         return
 
-#Works
+
 class Time():
     """
     Class for storing the information on the time for calling in the home UI message
@@ -573,6 +573,7 @@ class Time():
         self.day = self.now.day
         self.day_suffix = "st" if self.day%10 == 1 else "nd" if self.day%10 == 2 else "th"
         self.month = self.now.strftime("%B")
+
 
 class HomeUI(ConsoleUI):
     """
@@ -755,9 +756,16 @@ class HomeUI(ConsoleUI):
                         "Enter your search terms:"))
         search = self.user_input(13, 34)
         searched_library = self.library.search(self.category, search)
+
+        # Handles case where no results of search query
         if len(searched_library) == 0:
-            self.refresh_win(self.controls, "")
-            self.scr.addstr(7, 0, "\tNo Results found\nPress any key to try another search")
+            self.refresh_win(self.controls, "No Results found! Press any key to try another search")
+            self.scr.move(9, 8)
+            self.scr.getch()
+            self.change_main_panel("search")
+            self.search_user_control()
+            return
+        
         browse = BrowseUI(self.scr, "Search", "", self.library, searched_library)
         return browse.render()
 
@@ -955,7 +963,9 @@ def main(stdscr):
     #     stdscr.addstr(y, x, "0")
     #     stdscr.refresh()
 
-try:
-    wrapper(main)
-except Exception, err:
-    print(f"Program failed, error: {str(err)}. Click 'run program' to restart")
+wrapper(main)
+
+# try:
+#     wrapper(main)
+# except Exception, err:
+#     print(f"Program failed, error: {str(err)}. Click 'run program' to restart")
