@@ -117,7 +117,14 @@ class UserLibrary:
 
         return sorted_books
 
-    #def filter(self, cat):
+    def filter(self, cat, filter):
+        """
+        Functions that returns a list of book entries satisfying a certain
+        criteria for a particular category.
+        """
+        filtered_books = [book for book in self.books if book[cat] == filter]
+        return filtered_books
+
 
 #Works
 class DisplayBookMixin():
