@@ -1,5 +1,4 @@
 #GOOGLE DRIVE/SHEETS API
-from re import L
 import gspread
 from google.oauth2.service_account import Credentials
 #GOOGLE BOOKS API
@@ -124,7 +123,6 @@ class UserLibrary:
         """
         filtered_books = [book for book in self.books if book[cat] == filter]
         return filtered_books
-
 
 #Works
 class DisplayBookMixin():
@@ -451,10 +449,12 @@ class AddUI(DisplayBookMixin, ConsoleUI):
         return
 
 class BrowseUI(DisplayBookMixin, ConsoleUI):
-    def __init__(self, stdscr, heading, message, library, ordered_library=None):
+    def __init__(self, stdscr, heading, message, library, ordered_library=None, category=None, filter_opt=None):
         super().__init__(stdscr, heading, message)
         self.library = library
         self.ordered_library = ordered_library
+        self.category = category
+        self.filter_opt = filter_opt
 
     def edit_book(self, i):
         """
@@ -472,7 +472,11 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
         self.library.edit_book(i, self.inputs)
         self.refresh_win(self.query_win, "Edited entry! Press any key to return to browse.")
 
+        if "Filter" in self.heading:
+            self.ordered_library = self.library.filter(self.category, self.filter_opt)
+
         self.scr.getch()
+
         return
 
     def browse_display_book(self):
@@ -566,7 +570,8 @@ class HomeUI(ConsoleUI):
                             "r - sort by rating\n\nq - quit")
         self.filter_control = ("r - filter by read status\n"
                                 "o - filter by physical ownership\n"
-                                "a - filter by audiobook ownership")
+                                "a - filter by audiobook ownership\n\n"
+                                "q - quit")
         self.search_control = ("t - search by title\na - search by author\n"
                                 "\ng - search by genres\n\nq - quit")
 
@@ -599,10 +604,12 @@ class HomeUI(ConsoleUI):
         """
         if type == "main":
             self.panel(8, 20, self.main_control)
-        elif type == "sort":
-            self.panel(7, 19, self.sort_control)
         elif type == "search":
             self.panel(6, 21, self.search_control)
+        elif type == "sort":
+            self.panel(7, 19, self.sort_control)
+        elif type == "filter":
+            self.panel(5, 34, self.filter_control)
 
     def search_user_control(self):
         """
@@ -660,34 +667,73 @@ class HomeUI(ConsoleUI):
             elif key == "q":
                 return 
     
+    def get_filter_input(self):
+        """
+        Gets the filter the user wants to impose on their chosen category
+        """
+        if "Status" in self.category:
+            self.panel(7, 44, ("Which read status do you want to filter by?\n"
+                            "\nw - books you want to read\nr - books you are"
+                            " reading\nf - books you have finished\n\nq - quit"))
+            while True:
+                key = self.scr.getkey()
+                if key == "w":
+                    return "Want to read"
+                elif key == "r":
+                    return "Currently reading"
+                elif key == "f":
+                    return "Finished"
+        else:
+            phys_aud = self.category.split(" ")[1].lower()
+            self.panel(6, 60, (f"Which {phys_aud} ownership status do you want to "
+                            f"display by?\n\no - own {phys_aud}\nd - don't own "
+                            f"{phys_aud}\n\nq - quit"))
+            while True:
+                key = self.scr.getkey()
+                if key == "o":
+                    return "Yes"
+                elif key == "d":
+                    return "No"
+
+    def filter(self):
+        """
+        Filters library by chosen category
+        """
+        if self.category == "Status":
+            cat_string = "read status"
+        else:
+            cat_string = "own"
+
+        self.filter_opt = self.get_filter_input()
+        filter_library = self.library.filter(self.category, self.filter_opt)
+        browse = BrowseUI(self.scr, f"Filter by {cat_string}", "", self.library, filter_library, self.category, self.filter_opt)
+        return browse.render()
+
     def filter_user_control(self):
         """
-        Allows user to use key inputs to decide what action to take
+        Allows user to use key inputs to decide what they want to filter by
         """
         while True:
             key = self.scr.getkey()
-            if key == "b":
-                browse = BrowseUI(self.scr, "Library browse", "", self.library)
-                browse.render()
-                return self.render()
-            elif key == "a":
-                add = AddUI(self.scr, "Add book", ("\tPlease enter the title"
-                            " of the book you wish to add:"), self.library)
-                add.render()
-                return self.render()
-            elif key == "s":
-                self.refresh_win(self.controls, "")
-                self.display_controls("search")
-                return self.render()
+            if key == "r":
+                self.category = "Status"
+                return self.filter()
             elif key == "o":
-                self.refresh_win(self.controls, "")
-                self.display_controls("sort")
-                return self.render()
-            elif key == "f":
-                self.refresh_win(self. controls, "")
-                self.display_
+                self.category = "Own Physical"
+                return self.filter()
+            elif key == "a":
+                self.catgory = "Own Audiobook"
+                return self.filter()
             elif key == "q":
                 return
+
+    def search(self):
+
+    def search_user_control(self):
+        """
+        Displays search options to user and gets key input to find 
+        which category user wishes to search
+        """
 
     def change_main_panel(self, string):
         """
@@ -706,21 +752,23 @@ class HomeUI(ConsoleUI):
                 browse = BrowseUI(self.scr, "Library browse", "", self.library)
                 browse.render()
                 return self.render()
-            elif key == "a":
+            elif key == "a": 
                 add = AddUI(self.scr, "Add book", ("\tPlease enter the title"
                             " of the book you wish to add:"), self.library)
                 add.render()
                 return self.render()
             elif key == "s":
                 self.change_main_panel("search")
-
+                self.search_user_control()
+                return self.render()
             elif key == "o":
                 self.change_main_panel("sort")
                 self.sort_user_control()
                 return self.render()
             elif key == "f":
                 self.change_main_panel("filter")
-
+                self.filter_user_control()
+                return self.render()
             elif key == "q":
                 return
 
