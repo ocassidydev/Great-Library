@@ -431,14 +431,18 @@ class AddUI(DisplayBookMixin, ConsoleUI):
         return
 
 class BrowseUI(DisplayBookMixin, ConsoleUI):
-    def __init__(self, stdscr, heading, message, library):
+    def __init__(self, stdscr, heading, message, library, ordered_library=None):
         super().__init__(stdscr, heading, message)
         self.library = library
+        self.ordered_library = ordered_library
 
     def edit_book(self, i):
         """
         Allows user to input their new data on the book and then store the data
         """
+        if self.ordered_library != None:
+            i = self.library.books.index(self.ordered_library.books[i])
+
         self.clear_page()
         self.scr.addstr(7, 8, self.library.books[i]["Title"])
         self.query_win = curses.newwin(curses.LINES - 10, curses.COLS - 9, 9, 8)
@@ -476,12 +480,17 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
         Displays book information from the library to the screen and allows
         the user to iterate through their library using the arrow keys
         """
+        if self.ordered_library == None:
+            library = self.library
+        else:
+            library = self.ordered_library
+
         i = 0
         prev_i = -1
 
         while True:
             if i != prev_i:
-                self.book = Book(self.library.books[i])
+                self.book = Book(library.books[i])
                 self.browse_display_book()
                 
                 prev_i = i
@@ -489,7 +498,7 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
             key = self.scr.getkey()
             
             if key == "KEY_RIGHT":
-                if not i == len(self.library.books)-1:
+                if not i == len(library.books)-1:
                     i += 1
             elif key == "KEY_LEFT":
                 if not i == 0:
@@ -530,14 +539,14 @@ class HomeUI(ConsoleUI):
         super().__init__(stdscr, heading, message)
         self.library = library
         self.main_control = ("b - browse and edit\na - add book"
-                            "\n\ns - search book\no - sort books by\n\n"
-                            "q - save and quit")
+                            "\n\ns - search book\no - sort books by\n"
+                            "f - filter books by\n\nq - save and quit")
         self.sort_control = ("t - sort by title\na - sort by author\n"
                             "p - sort by pages\ng - sort by genres\n"
-                            "r - sort by rating\n\ns - filter by read"
-                            " status\no - filter by physical ownership"
-                            "\na - filter by audiobook ownership\n\n"
-                            "q - quit")
+                            "r - sort by rating\n\nq - quit")
+        self.filter_control = ("r - filter by read status\n"
+                                "o - filter by physical ownership\n"
+                                "a - filter by audiobook ownership")
         self.search_control = ("t - search by title\na - search by author\n"
                                 "\ng - search by genres\n\nq - quit")
 
@@ -569,15 +578,15 @@ class HomeUI(ConsoleUI):
         Displays the different types of controls to the main panel.
         """
         if type == "main":
-            self.panel(7, 20, self.main_control)
+            self.panel(8, 20, self.main_control)
         elif type == "sort":
-            self.panel(12, 33, self.sort_control)
+            self.panel(7, 19, self.sort_control)
             self.scr.getch()
         elif type == "search":
             self.panel(6, 21, self.search_control)
             self.scr.getch()
 
-    def main_user_control(self):
+    def search_user_control(self):
         """
         Allows user to use key inputs to decide what action to take
         """
@@ -596,16 +605,99 @@ class HomeUI(ConsoleUI):
                 self.refresh_win(self.controls, "")
                 self.display_controls("search")
                 return self.render()
-                #search = SearchUI(self.scr, "", "", self.library)
-                #search.render()
-                #return self.render()
             elif key == "o":
                 self.refresh_win(self.controls, "")
                 self.display_controls("sort")
                 return self.render()
-                #sort = display_controls()
-                #sort.render()
-                #return self.render()
+            elif key == "f":
+                self.refresh_win(self. controls, "")
+                self.display_
+            elif key == "q":
+                return
+
+    def sort_user_control(self):
+        """
+        Allows user to use key inputs to decide how they want to sort library.
+        """
+        while True:
+            key = self.scr.getkey()
+            if key == "t":
+                sort_library = self.library.sort("title")
+                browse = BrowseUI(self.scr, "Browse by title", "", self.library, sort_library)
+                browse.render()
+                return self.render()
+            elif key == "a":
+                sort_library = self.library.sort("author")
+                browse = BrowseUI(self.scr, "Library browse", "", self.library, sort_library)
+                browse.render()
+                return self.render()
+            elif key == "p":
+                
+                return self.render()
+            elif key == "g":
+                
+                return self.render()
+            elif key == "q":
+                return
+    
+    def filter_user_control(self):
+        """
+        Allows user to use key inputs to decide what action to take
+        """
+        while True:
+            key = self.scr.getkey()
+            if key == "b":
+                browse = BrowseUI(self.scr, "Library browse", "", self.library)
+                browse.render()
+                return self.render()
+            elif key == "a":
+                add = AddUI(self.scr, "Add book", ("\tPlease enter the title"
+                            " of the book you wish to add:"), self.library)
+                add.render()
+                return self.render()
+            elif key == "s":
+                self.refresh_win(self.controls, "")
+                self.display_controls("search")
+                return self.render()
+            elif key == "o":
+                self.refresh_win(self.controls, "")
+                self.display_controls("sort")
+                return self.render()
+            elif key == "f":
+                self.refresh_win(self. controls, "")
+                self.display_
+            elif key == "q":
+                return
+
+    def change_main_panel(self, string):
+        """
+        Refactor to avoid repetition in main_user_controls
+        """
+        self.refresh_win(self.controls, "")
+        self.display_controls(string)
+        return self.render()
+
+    def main_user_control(self):
+        """
+        Allows user to use key inputs to decide what action to take
+        """
+        while True:
+            key = self.scr.getkey()
+            if key == "b":
+                browse = BrowseUI(self.scr, "Library browse", "", self.library)
+                browse.render()
+                return self.render()
+            elif key == "a":
+                add = AddUI(self.scr, "Add book", ("\tPlease enter the title"
+                            " of the book you wish to add:"), self.library)
+                add.render()
+                return self.render()
+            elif key == "s":
+                return self.change_main_panel("search")
+            elif key == "o":
+                return self.change_main_panel("sort")
+            elif key == "f":
+                return self.change_main_panel("filter")
             elif key == "q":
                 return
 
