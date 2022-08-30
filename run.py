@@ -100,11 +100,24 @@ class UserLibrary:
             self.books[index][attr] = data
             self.worksheet.update_cell(index+2, i+6, data)
         
-    #def sort(self, cat):
+    def sort(self, cat):
+        """
+        Function that returns an ordered list of book entry dictionaries corresponding
+        to a library sorted by the input category.
+        """
+        #avoids soft copying
+        sort_attrs = [book[cat].replace("The ", "") for book in self.books]
+        sort_attrs.sort()
+        attrs = [book[cat].replace("The ", "") for book in self.books]
+
+        sorted_books = []
+        for s_attr in sort_attrs:
+            i = attrs.index(s_attr)
+            sorted_books.append(self.books[i])
+
+        return sorted_books
 
     #def filter(self, cat):
-
-    #def update_data(self):
 
 #Works
 class DisplayBookMixin():
@@ -441,7 +454,7 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
         Allows user to input their new data on the book and then store the data
         """
         if self.ordered_library != None:
-            i = self.library.books.index(self.ordered_library.books[i])
+            i = self.library.books.index(self.ordered_library[i])
 
         self.clear_page()
         self.scr.addstr(7, 8, self.library.books[i]["Title"])
@@ -468,7 +481,7 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
                                     f"{self.book.status}\n"
                                     f"{self.book.ownphys}\n"
                                     f"{self.book.ownaud}\n"))
-        self.scr.move(22, 8)
+        self.scr.move(23, 8)
 
         self.attr_win.refresh()
         self.detail_win.refresh()
@@ -480,17 +493,17 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
         Displays book information from the library to the screen and allows
         the user to iterate through their library using the arrow keys
         """
-        if self.ordered_library == None:
-            library = self.library
+        if self.ordered_library is None:
+            books = self.library.books
         else:
-            library = self.ordered_library
+            books = self.ordered_library
 
         i = 0
         prev_i = -1
 
         while True:
             if i != prev_i:
-                self.book = Book(library.books[i])
+                self.book = Book(books[i])
                 self.browse_display_book()
                 
                 prev_i = i
@@ -498,7 +511,7 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
             key = self.scr.getkey()
             
             if key == "KEY_RIGHT":
-                if not i == len(library.books)-1:
+                if not i == len(books)-1:
                     i += 1
             elif key == "KEY_LEFT":
                 if not i == 0:
@@ -581,10 +594,8 @@ class HomeUI(ConsoleUI):
             self.panel(8, 20, self.main_control)
         elif type == "sort":
             self.panel(7, 19, self.sort_control)
-            self.scr.getch()
         elif type == "search":
             self.panel(6, 21, self.search_control)
-            self.scr.getch()
 
     def search_user_control(self):
         """
@@ -619,10 +630,9 @@ class HomeUI(ConsoleUI):
         """
         Refactor to avoid repetition in sort_user_control
         """
-        sort_library = self.library.sort(sortstring)
-        browse = BrowseUI(self.scr, f"Browse by {sortstring}", "", self.library, sort_library)
-        browse.render()
-        return self.render()
+        sort_library = self.library.sort(sortstring.capitalize())
+        browse = BrowseUI(self.scr, f"Sort by {sortstring}", "", self.library, sort_library)
+        return browse.render()
 
     def sort_user_control(self):
         """
@@ -637,9 +647,11 @@ class HomeUI(ConsoleUI):
             elif key == "p":
                 return self.sort("pages")
             elif key == "g":
-                return self.sort("genre")
+                return self.sort("genres") 
+            elif key == "r":
+                return self.sort("rating")
             elif key == "q":
-                return
+                return 
     
     def filter_user_control(self):
         """
@@ -676,7 +688,6 @@ class HomeUI(ConsoleUI):
         """
         self.refresh_win(self.controls, "")
         self.display_controls(string)
-        return self.render()
 
     def main_user_control(self):
         """
@@ -694,11 +705,15 @@ class HomeUI(ConsoleUI):
                 add.render()
                 return self.render()
             elif key == "s":
-                return self.change_main_panel("search")
+                self.change_main_panel("search")
+
             elif key == "o":
-                return self.change_main_panel("sort")
+                self.change_main_panel("sort")
+                self.sort_user_control()
+                return self.render()
             elif key == "f":
-                return self.change_main_panel("filter")
+                self.change_main_panel("filter")
+
             elif key == "q":
                 return
 
