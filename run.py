@@ -538,6 +538,8 @@ class HomeUI(ConsoleUI):
                             " status\no - filter by physical ownership"
                             "\na - filter by audiobook ownership\n\n"
                             "q - quit")
+        self.search_control = ("t - search by title\na - search by author\n"
+                                "\ng - search by genres\n\nq - quit")
 
     def update_time(self):
         """
@@ -557,9 +559,9 @@ class HomeUI(ConsoleUI):
         Creates the panel of user controls based on user input
         """
         x, y = 8, 12
-        controls = curses.newwin(lines, cols, y, x)
+        self.controls = curses.newwin(lines, cols, y, x)
         self.scr.refresh()
-        self.refresh_win(controls, string)
+        self.refresh_win(self.controls, string)
         self.scr.move(y + lines + 1, x)
 
     def display_controls(self, type):
@@ -572,7 +574,8 @@ class HomeUI(ConsoleUI):
             self.panel(12, 33, self.sort_control)
             self.scr.getch()
         elif type == "search":
-            pass
+            self.panel(6, 21, self.search_control)
+            self.scr.getch()
 
     def main_user_control(self):
         """
@@ -590,12 +593,16 @@ class HomeUI(ConsoleUI):
                 add.render()
                 return self.render()
             elif key == "s":
-                pass
+                self.refresh_win(self.controls, "")
+                self.display_controls("search")
+                return self.render()
                 #search = SearchUI(self.scr, "", "", self.library)
                 #search.render()
                 #return self.render()
             elif key == "o":
+                self.refresh_win(self.controls, "")
                 self.display_controls("sort")
+                return self.render()
                 #sort = display_controls()
                 #sort.render()
                 #return self.render()
