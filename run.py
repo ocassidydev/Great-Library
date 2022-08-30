@@ -146,7 +146,7 @@ class DisplayBookMixin():
         self.inputs = []
         for query in self.queries:
             self.refresh_win(self.query_win, query)
-            self.scr.move(9, 8)
+            self.scr.move(11, 8)
 
             if query == "":
                 continue
@@ -355,7 +355,8 @@ class AddUI(DisplayBookMixin, ConsoleUI):
         """
         self.clear_page()
 
-        self.query_win = curses.newwin(curses.LINES - 8, curses.COLS - 9, 7, 8)
+        self.scr.addstr(7, 8, self.add_book.title)
+        self.query_win = curses.newwin(curses.LINES - 10, curses.COLS - 9, 9, 8)
         self.user_entry_input()
         
         self.refresh_win(self.query_win, "Adding book to library...")
@@ -428,12 +429,6 @@ class AddUI(DisplayBookMixin, ConsoleUI):
         self.main_user_control()
         return
 
-#class EditUI(ConsoleUI):
-
-#class SearchUI(ConsoleUI):
-
-#Class SortUI(ConsoleUI):
-
 class BrowseUI(DisplayBookMixin, ConsoleUI):
     def __init__(self, stdscr, heading, message, library):
         super().__init__(stdscr, heading, message)
@@ -444,8 +439,8 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
         Allows user to input their new data on the book and then store the data
         """
         self.clear_page()
-
-        self.query_win = curses.newwin(curses.LINES - 8, curses.COLS - 9, 7, 8)
+        self.scr.addstr(7, 8, self.library.books[i]["Title"])
+        self.query_win = curses.newwin(curses.LINES - 10, curses.COLS - 9, 9, 8)
         self.user_entry_input()
         
         self.refresh_win(self.query_win, "Editing book entry in library...")
