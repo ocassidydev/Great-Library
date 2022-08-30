@@ -99,11 +99,18 @@ class UserLibrary:
 
     #def update_data(self):
 
+#Works
 class DisplayBookMixin():
     """
     Mixin for a commonly used method of displaying information on the book 
     object on the screen and taking user input on book data.
     """
+    queries = ["","How would you rate this book out of 5? Hit enter if n/a.",
+                ("Is this a book that you: want to read (w), are "
+                "currently reading (r), or have finished (f)?"),
+                "Do you own a physical copy? (y/n)",
+                "Do you own an audiobook of this book? (y/n)", ""]
+
     def display_book(self, book):
         self.attr_win = curses.newwin(13, curses.COLS-9, 7, 8)
         self.detail_win = curses.newwin(13, curses.COLS - 22, 7, 21)
@@ -123,12 +130,6 @@ class DisplayBookMixin():
         self.attr_win.refresh()
         self.detail_win.refresh()
         return
-
-    self.queries = ["","How would you rate this book out of 5? Hit enter if n/a.",
-                ("Is this a book that you: want to read (w), are "
-                "currently reading (r), or have finished (f)?"),
-                "Do you own a physical copy? (y/n)",
-                "Do you own an audiobook of this book? (y/n)", ""]
 
     def user_entry_input(self):
         """
@@ -223,7 +224,6 @@ class ConsoleUI:
         """
         Clears the page, reprinting the heading
         """
-        self.scr.clear()
         self.render_heading()
         self.scr.refresh()
 
@@ -354,7 +354,6 @@ class AddUI(DisplayBookMixin, ConsoleUI):
         self.refresh_win(self.query_win, "Adding book to library...")
         self.library.add_book(self.add_book, self.inputs)
         self.refresh_win(self.query_win, "Added book! Press any key to return to homepage.")
-        self.query_win.refresh()
 
         self.scr.getch()
         return
@@ -433,8 +432,21 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
         super().__init__(stdscr, heading, message)
         self.library = library
 
-    def edit_ui(self):
-        self.scr.addstr(21, 8, "arrow right/left - navigate entries\te - edit entry\tq - quit")
+    def edit_book(self, i):
+        """
+        Allows user to input their new data on the book and then store the data
+        """
+        self.clear_page()
+
+        self.query_win = curses.newwin(curses.LINES - 8, curses.COLS - 9, 7, 8)
+        self.user_entry_input()
+        
+        self.refresh_win(self.query_win, "Editing book entry in library...")
+        self.library.edit_book(self.add_book, i, self.inputs)
+        self.refresh_win(self.query_win, "Edited entry! Press any key to return to browse.")
+
+        self.scr.getch()
+        return
 
     def browse_display_book(self):
         """
@@ -479,14 +491,15 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
             elif key == "KEY_LEFT":
                 if not i == 0:
                     i -= 1
-            if key == "e":
-
+            elif key == "e":
+                self.edit_book()
+                return self.render()
             elif key == "q":
                 return
 
     def render(self):
         super().render()
-        self.edit_ui()
+        self.scr.addstr(21, 8, "arrow right/left - navigate entries\te - edit entry\tq - quit")
         self.scroll_books()
         return
 
