@@ -728,12 +728,34 @@ class HomeUI(ConsoleUI):
                 return
 
     def search(self):
+        """
+        Takes users search term, call
+        """
+        self.panel(2, 51, ("(Note: mispelled searches will not return results)\n"
+                        "Enter your search terms:"))
+        search = self.user_input(13, 26)
+        searched_library = self.library.search(self.category, search)
+        browse = BrowseUI(self.scr, "Search", "", self.library, searched_library)
+        return browse.render()
 
     def search_user_control(self):
         """
         Displays search options to user and gets key input to find 
         which category user wishes to search
         """
+        while True:
+            key = self.getkey()
+            if key == "t":
+                self.category = "Title"
+                return self.search()
+            elif key == "a":
+                self.category = "Author"
+                return self.search()
+            elif key == "g":
+                self.category = "Genres"
+                return self.search()
+            elif key == "q":
+                return
 
     def change_main_panel(self, string):
         """
