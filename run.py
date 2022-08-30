@@ -105,15 +105,24 @@ class UserLibrary:
         Function that returns an ordered list of book entry dictionaries corresponding
         to a library sorted by the input category.
         """
-        #avoids soft copying
-        sort_attrs = [book[cat].replace("The ", "") for book in self.books]
-        sort_attrs.sort()
-        attrs = [book[cat].replace("The ", "") for book in self.books]
+        if cat == "Title":
+            # avoids soft copying
+            sort_attrs = [book[cat].replace("The ", "") for book in self.books]
+            sort_attrs.sort()
+            attrs = [book[cat].replace("The ", "") for book in self.books]
 
-        sorted_books = []
-        for s_attr in sort_attrs:
-            i = attrs.index(s_attr)
-            sorted_books.append(self.books[i])
+            sorted_books = []
+            for s_attr in sort_attrs:
+                i = attrs.index(s_attr)
+                sorted_books.append(self.books[i])
+        elif cat == "Rating":
+            sorted_books = sorted(self.books, key=lambda i: i[cat], reverse=True)
+
+            for book in sorted_books:
+                if book[cat] == "n/a":
+                    sorted_books.remove(book)
+        else:
+            sorted_books = sorted(self.books, key=lambda i: i[cat])
 
         return sorted_books
 
