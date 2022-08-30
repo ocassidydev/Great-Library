@@ -165,7 +165,7 @@ class UserLibrary:
         return searched_books    
 
 
-class DisplayBookMixin():
+class DisplayBookMixin:
     """
     Mixin for a commonly used method of displaying information on the book 
     object on the screen and taking user input on book data.
@@ -591,14 +591,14 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
         return
 
 
-class Time():
+class Time:
     """
     Class for storing the information on the time for calling in the home UI message
     """
     def __init__(self):
         self.now = datetime.now()
 
-        hour = self.now.hour
+        hour = self.now.hour + 1
         self.am_pm = "am" if hour < 12 else "pm"
         self.hour = 12 if hour == 0 else hour if hour <= 12 else hour - 12
         self.days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
