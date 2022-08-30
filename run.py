@@ -41,7 +41,7 @@ class Book:
     Has two distinct calls through search_bool, 
     either from raw API data or clean in-house data.
     """
-    def __init__(self, bookdata, search_bool):
+    def __init__(self, bookdata, search_bool=False):
         if search_bool:
             self.title = bookdata.get('title', 'title not found')
             self.author = bookdata.get('authors', 'author not found')[0]
@@ -56,7 +56,11 @@ class Book:
             self.author = bookdata["Author"]
             self.pages = bookdata["Pages"]
             self.categories = bookdata["Genres"]
-            self.description = bookdata["Description"]        
+            self.description = bookdata["Description"]
+            self.rating = bookdata["Rating"]
+            self.status = bookdata["Status"]
+            self.ownphys = bookdata["Own Physical"]
+            self.ownaud = bookdata["Own Audiobook"]
 
 class UserLibrary:
     """
@@ -97,27 +101,78 @@ class UserLibrary:
 
 class DisplayBookMixin():
     """
-    Mixin for a commonly used method of displaying information on the book object on the screen
+    Mixin for a commonly used method of displaying information on the book 
+    object on the screen and taking user input on book data.
     """
     def display_book(self, book):
-        self.attr_win = curses.newwin(curses.LINES-8, curses.COLS-9, 7, 8)
-        self.detail_win = curses.newwin(curses.LINES-8, curses.COLS - 22, 7, 21)
+        self.attr_win = curses.newwin(13, curses.COLS-9, 7, 8)
+        self.detail_win = curses.newwin(13, curses.COLS - 22, 7, 21)
 
-        #bug if user hit ctrl+x
-        self.attr_win.addstr(("Title: \n"
-                            "Author: \n"
-                            "Pages: \n"
-                            "Genres: \n"
-                            "Description: "))
-        self.detail_win.addstr((f"{book.title}\n"
-                                f"{book.author}\n"
-                                f"{book.pages}\n"
-                                f"{book.categories}\n"
-                                f"{book.description}"))
+        self.refresh_win(self.attr_win, ("Title: \n"
+                                    "Author: \n"
+                                    "Pages: \n"
+                                    "Genres: \n"
+                                    "Description: "))
+        self.refresh_win(self.detail_win, (f"{book.title}\n"
+                                        f"{book.author}\n"
+                                        f"{book.pages}\n"
+                                        f"{book.categories}\n"
+                                        f"{book.description}"))
         self.scr.move(22, 8)
 
         self.attr_win.refresh()
         self.detail_win.refresh()
+        return
+
+    self.queries = ["","How would you rate this book out of 5? Hit enter if n/a.",
+                ("Is this a book that you: want to read (w), are "
+                "currently reading (r), or have finished (f)?"),
+                "Do you own a physical copy? (y/n)",
+                "Do you own an audiobook of this book? (y/n)", ""]
+
+    def user_entry_input(self):
+        """
+        Takes user key inputs for variety of information about 
+        the book entry they're adding/editing
+        """
+        self.inputs = []
+        for query in self.queries:
+            self.refresh_win(self.query_win, query)
+            self.scr.move(9, 8)
+
+            if query == "":
+                continue
+            
+            while True:
+                key = self.scr.getkey()
+
+                if "out of 5?" in query:
+                    if key.isnumeric():
+                        if int(key) in list(range(1,6)):
+                            self.inputs.append(f"{key}/5")
+                            break
+                    elif key == "\n":
+                        self.inputs.append("n/a")
+                        break
+
+                elif "have finished (f)?" in query:
+                    if key == "w":
+                        self.inputs.append("Want to read")
+                        break
+                    elif key == "r":
+                        self.inputs.append("Currently reading")
+                        break
+                    elif key == "f":
+                        self.inputs.append("Finished")
+                        break
+
+                elif "physical copy?" or "audiobook" in query:
+                    if key == "y":
+                        self.inputs.append("Yes")
+                        break
+                    elif key == "n":
+                        self.inputs.append("No")
+                        break
 
 #Works
 class ConsoleUI:
@@ -275,11 +330,6 @@ class AddUI(DisplayBookMixin, ConsoleUI):
     def __init__(self, stdscr, heading, message, library):
         super().__init__(stdscr, heading, message)
         self.library = library
-        self.queries = ["","How would you rate this book out of 5? Hit enter if n/a.",
-                ("Is this a book that you: want to read (w), are "
-                "currently reading (r), or have finished (f)?"),
-                "Do you own a physical copy? (y/n)",
-                "Do you own an audiobook of this book? (y/n)", ""]
 
     def search(self):
         resp = urlopen(f"{GBOOKS}{self.query}")
@@ -292,50 +342,6 @@ class AddUI(DisplayBookMixin, ConsoleUI):
                                 "\tp - prev result\n\ts - enter new search"
                                 "\n\tq - quit"))                      
 
-    def add_new_book_control(self):
-        """
-        Takes user key inputs for variety of information about 
-        the book they're adding.
-        """
-        self.inputs = []
-        for query in self.queries:
-            self.refresh_win(self.query_win, query)
-            self.scr.move(9, 8)
-
-            if query == "":
-                continue
-            
-            while True:
-                key = self.scr.getkey()
-
-                if "out of 5?" in query:
-                    if key.isnumeric():
-                        if int(key) in list(range(1,6)):
-                            self.inputs.append(f"{key}/5")
-                            break
-                    elif key == "\n":
-                        self.inputs.append("n/a")
-                        break
-
-                elif "have finished (f)?" in query:
-                    if key == "w":
-                        self.inputs.append("Want to read")
-                        break
-                    elif key == "r":
-                        self.inputs.append("Currently reading")
-                        break
-                    elif key == "f":
-                        self.inputs.append("Finished")
-                        break
-
-                elif "physical copy?" or "audiobook" in query:
-                    if key == "y":
-                        self.inputs.append("Yes")
-                        break
-                    elif key == "n":
-                        self.inputs.append("No")
-                        break
-
     def add_new_book(self):
         """
         Allows user to input their data on the book and then store the data
@@ -343,7 +349,7 @@ class AddUI(DisplayBookMixin, ConsoleUI):
         self.clear_page()
 
         self.query_win = curses.newwin(curses.LINES - 8, curses.COLS - 9, 7, 8)
-        self.add_new_book_control()
+        self.user_entry_input()
         
         self.refresh_win(self.query_win, "Adding book to library...")
         self.library.add_book(self.add_book, self.inputs)
@@ -366,7 +372,7 @@ class AddUI(DisplayBookMixin, ConsoleUI):
                                 f"{self.book_data['items'][i]['volumeInfo'].get('authors','author not found')[0]}"))
                 
                 self.scr.move(20, 8)
-                prev_i == i
+                prev_i = i
             
             key = self.scr.getkey()
             if key == "\n":
@@ -422,9 +428,69 @@ class AddUI(DisplayBookMixin, ConsoleUI):
 
 #Class SortUI(ConsoleUI):
 
-# class BrowseUI(DisplayBookMixin, ConsoleUI):
-#     def __init__(self, stdscr, heading, message, library):
+class BrowseUI(DisplayBookMixin, ConsoleUI):
+    def __init__(self, stdscr, heading, message, library):
+        super().__init__(stdscr, heading, message)
+        self.library = library
 
+    def edit_ui(self):
+        self.scr.addstr(21, 8, "arrow right/left - navigate entries\te - edit entry\tq - quit")
+
+    def browse_display_book(self):
+        """
+        Version of display_book that contains extra user input information
+        """
+        self.display_book(self.book)
+        self.attr_win.addstr(8, 0, ("Rating: \n"
+                                    "Status: \n"
+                                    "Own print: \n"
+                                    "Audiobook: \n"))
+        self.detail_win.addstr(8, 0, (f"{self.book.rating}\n"
+                                    f"{self.book.status}\n"
+                                    f"{self.book.ownphys}\n"
+                                    f"{self.book.ownaud}\n"))
+        self.scr.move(22, 8)
+
+        self.attr_win.refresh()
+        self.detail_win.refresh()
+        return
+
+    #Bug - won't display unless keypress at least once
+    def scroll_books(self):
+        """
+        Displays book information from the library to the screen and allows
+        the user to iterate through their library using the arrow keys
+        """
+        i = 0
+        prev_i = -1
+
+        while True:
+            if i != prev_i:
+                self.book = Book(self.library.books[i])
+                self.browse_display_book()
+                
+                prev_i = i
+
+            key = self.scr.getkey()
+            
+            if key == "KEY_RIGHT":
+                if not i == len(self.library.books)-1:
+                    i += 1
+            elif key == "KEY_LEFT":
+                if not i == 0:
+                    i -= 1
+            if key == "e":
+
+            elif key == "q":
+                return
+
+    def render(self):
+        super().render()
+        self.edit_ui()
+        self.scroll_books()
+        return
+
+#Works
 class Time():
     """
     Class for storing the information on the time for calling in the home UI message
@@ -447,9 +513,8 @@ class HomeUI(ConsoleUI):
     def __init__(self, stdscr, heading, message, library):
         super().__init__(stdscr, heading, message)
         self.library = library
-        self.main_control = ("a - add new title\ne - edit catalog"
-                            "\n\ns - search\no - sort catalog by"
-                            "\nb - browse entire catalog\n\n"
+        self.main_control = ("b - browse and edit\na - add book"
+                            "\n\ns - search book\no - sort books by\n\n"
                             "q - save and quit")
 
     def update_time(self):
@@ -473,16 +538,15 @@ class HomeUI(ConsoleUI):
         """
         while True:
             key = self.scr.getkey()
-            if key == "a":
+            if key == "b":
+                browse = BrowseUI(self.scr, "Library browse", "", self.library)
+                browse.render()
+                return self.render()
+            elif key == "a":
                 add = AddUI(self.scr, "Add book", ("\tPlease enter the title"
                             " of the book you wish to add:"), self.library)
                 add.render()
                 return self.render()
-            elif key == "e":
-                pass
-                #edit = EditUI(self.scr, "", "", self.library)
-                #edit.render()
-                #return self.render()
             elif key == "s":
                 pass
                 #search = SearchUI(self.scr, "", "", self.library)
@@ -493,10 +557,6 @@ class HomeUI(ConsoleUI):
                 #sort = display_controls()
                 #sort.render()
                 #return self.render()
-            elif key == "b":
-                browse = BrowseUI(self.scr, "", "", self.library)
-                browse.render()
-                return self.render()
             elif key == "q":
                 return
 
