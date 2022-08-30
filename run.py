@@ -72,6 +72,8 @@ class UserLibrary:
         self.user = user
         self.worksheet = SHEET.worksheet(user)
         self.books = self.worksheet.get_all_records()
+    
+    attrs = ["Rating", "Status", "Own Physical", "Own Audiobook"]
 
     def add_book(self, book, input_data):
         """
@@ -84,18 +86,23 @@ class UserLibrary:
         book_dict["Genres"] = book.categories
         book_dict["Description"] = book.description
 
-        attrs = ["Rating", "Status", "Own Physical", "Own Audiobook"]
-        for attr, data in zip(attrs, input_data):
+        for attr, data in zip(self.attrs, input_data):
             book_dict[attr] = data
 
         self.books.append(book_dict)
         self.worksheet.append_row(list(book_dict.values()))
         
+    def edit_book(self, index, input_data):
+        """
+        Updates a book entry with user input
+        """
+        for i, (attr, data) in enumerate(zip(self.attrs, input_data)):
+            self.books[index][attr] = data
+            self.worksheet.update_cell(index+2, i+6, data)
+        
     #def sort(self, cat):
 
     #def filter(self, cat):
-
-    #def edit(self, book):
 
     #def update_data(self):
 
@@ -442,7 +449,7 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
         self.user_entry_input()
         
         self.refresh_win(self.query_win, "Editing book entry in library...")
-        self.library.edit_book(self.add_book, i, self.inputs)
+        self.library.edit_book(i, self.inputs)
         self.refresh_win(self.query_win, "Edited entry! Press any key to return to browse.")
 
         self.scr.getch()
@@ -492,7 +499,7 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
                 if not i == 0:
                     i -= 1
             elif key == "e":
-                self.edit_book()
+                self.edit_book(i)
                 return self.render()
             elif key == "q":
                 return
