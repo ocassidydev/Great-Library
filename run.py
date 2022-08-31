@@ -662,7 +662,7 @@ class HomeUI(ConsoleUI):
         elif type == "search":
             self.panel(5, 21, self.search_control)
         elif type == "sort":
-            if len(self.library.sort("sort")) == 0:
+            if len(self.library.sort("Rating")) == 0:
                 self.panel(6, 19, self.sort_control)
             else:
                 self.panel(6, 19, self.sort_control.replace("\n\n", "\nr - sort by rating\n\n"))

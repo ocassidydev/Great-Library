@@ -158,12 +158,36 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 &nbsp;
 #### Home interface - search options
 - The following table goes through each possible key input in the search options part of the home interface, listing expected behavior and what actually occurs.
+
 |Key input          |Expected Behavior     |What Occurs             |Working as intended?   |
 |:------------------|:---------------------|:-----------------------|:---------------------:|
 | t                 |Changes control window to search input|Changes control window to search input|✔                     |
 | a                 |Changes control window to search input|Changes control window to search input|✔                     |
 | g                 |Changes control window to search input|Changes control window to search input|✔                     |
-| q                 |Goes back to starting state on home UI|Goes back to starting state on home UI|✔                     |
+| q                 |Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
+
+\
+&nbsp;
+#### Home interface - search
+- The following table goes through each possible text input in the search part of the home interface, listing expected behavior and what actually occurs.
+
+|Text input          |Expected Behavior     |What Occurs             |Working as intended?   |
+|:------------------|:---------------------|:-----------------------|:---------------------:|
+|Text with a match in library|Brings up browse interface to display books that match search|Brings up browse interface to display books that match search|✔                     |
+|Text with no match in library|Informs user there is no match, any keys to start search from search option interface|Informs user there is no match, any keys to start search from search option interface|✔                     |
+|Empty text|Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
+
+\
+&nbsp;
+#### Home interface - sort options
+- The following table goes through each possible key input in the sort options part of the home interface, listing expected behavior and what actually occurs.
+
+|Key input          |Expected Behavior     |What Occurs             |Working as intended?   |
+|:------------------|:---------------------|:-----------------------|:---------------------:|
+| t                 |Changes control window to search input|Changes control window to search input|✔                     |
+| a                 |Changes control window to search input|Changes control window to search input|✔                     |
+| g                 |Changes control window to search input|Changes control window to search input|✔                     |
+| q                 |Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
 
 
 ### Add interface
@@ -182,7 +206,7 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 
     - Bug where if user's library contains no books that have ratings (ie. user has entered n/a on all of them), then sorting by rating will crash the program as the returned sorted library is empty
     - Bug where if the user's library contains no books fitting a certain criteria (ie. no books that have been finished), then filtering by that criteria will as the returned filtered library is empty  
-    - Various bugs where windows would not display properly or empty. These varied in severity, from slightly breaking the interface to completely crashing the program
+    - Various bugs where windows would not display properly or empty. These varied in severity, from slightly breaking the interface to completely crashing the program.
 
 &nbsp;
 ### Libraries 
