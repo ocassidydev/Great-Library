@@ -12,8 +12,6 @@ from curses.textpad import Textbox, rectangle
 
 from datetime import datetime
 
-from textwrap import wrap
-
 # Plugging in APIs
 # DRIVE AND SHEET
 SCOPE = [
