@@ -53,26 +53,28 @@ class Book:
             
             # Adds description subtended so it fits and displays properly on
             # screen
-            description = bookdata.get(
-                'description', 'Description not found.').split(" ")
-            description_string = ""
-            j = 0
-            for i in range(4):
-                line_string = ""
-                while len(f"{line_string}{description[j]} ") <= (curses.COLS - 21):
-                    if j > len(description):
+            description = bookdata.get('description', 'Description not found.').split(" ")
+            try: 
+                description_string = ""
+                j = 0
+                for i in range(4):
+                    line_string = ""
+                    while len(f"{line_string}{description[j]} ") <= (curses.COLS - 21):
+                        if j > len(description) - 1:
+                            break
+                        line_string += f"{description[j]} "
+                        j += 1
+                
+                    description_string += line_string
+                    if i != 4:
+                        description_string += "\n"
+                    if j > len(description) - 1:
                         break
-                    line_string += f"{description[j]} "
-                    j += 1
-            
-                description_string += line_string
-                if i != 4:
-                    description_string += "\n"
-                if j > len(description):
-                    break
 
-            if i == 3 and len(line_string) >= curses.COLS - 32:
-                description_string = " ".join(description_string.split(" ")[:-3]) + "..."
+                if i == 3 and len(line_string) >= curses.COLS - 32:
+                    description_string = " ".join(description_string.split(" ")[:-3]) + "..."
+            except:
+                description_string = " ".join(description)
             
             self.description = description_string
         
@@ -143,11 +145,11 @@ class UserLibrary:
                 i = attrs.index(s_attr)
                 sorted_books.append(self.books[i])
         elif cat == "Rating":
-            sorted_books = sorted(self.books, key=lambda i: i[cat], reverse=True)
-
-            for book in sorted_books:
-                if book[cat] == "n/a":
-                    sorted_books.remove(book)
+            books = sorted(self.books, key=lambda i: i[cat], reverse=True)
+            sorted_books = []
+            for book in books:
+                if book[cat] != "n/a":
+                    sorted_books.append(book)
         else:
             sorted_books = sorted(self.books, key=lambda i: i[cat])
 
@@ -682,7 +684,7 @@ class HomeUI(ConsoleUI):
             if len(self.library.sort("Rating")) == 0:
                 self.panel(6, 19, self.sort_control)
             else:
-                self.panel(6, 19, self.sort_control.replace("\n\n", "\nr - sort by rating\n\n"))
+                self.panel(7, 19, self.sort_control.replace("\n\n", "\nr - sort by rating\n\n"))
         elif type == "filter":
             self.panel(5, 34, self.filter_control)
 
@@ -708,7 +710,7 @@ class HomeUI(ConsoleUI):
                 return self.sort("pages")
             elif key == "g":
                 return self.sort("genres") 
-            elif len(self.library.sort("sort")) != 0 and key == "r":
+            elif len(self.library.sort("Rating")) != 0 and key == "r":
                 return self.sort("rating")
             elif key == "q":
                 return 

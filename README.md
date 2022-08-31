@@ -191,6 +191,18 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 
 \
 &nbsp;
+#### Home interface - filter options
+- The following table goes through each possible key input in the sort options part of the home interface, listing expected behavior and what actually occurs.
+
+|Key input          |Expected Behavior     |What Occurs             |Working as intended?   |
+|:------------------|:---------------------|:-----------------------|:---------------------:|
+| t                 |Changes control window to search input|Changes control window to search input|✔                     |
+| a                 |Changes control window to search input|Changes control window to search input|✔                     |
+| p                 |Changes control window to search input|Changes control window to search input|✔                     |
+| g                 |Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
+
+\
+&nbsp;
 ### Add interface
 - The following table goes through each possible text input in the search part of the add interface, listing expected behavior and what actually occurs.
 
@@ -205,13 +217,36 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 
 |Key input          |Expected Behavior     |What Occurs         |Working as intended?   |
 |:------------------|:---------------------|:-------------------|:---------------------:|
-| n or arrow right  |displays next entry, unless at end of list, where it does nothing||✔                     |
-| p or arrow left  |displays previous entry, unless at beginning of list, where it does nothing||✔                     |
-| enter             |brings up confirm interface||✔                     |
-| enter             |brings up confirm interface||✔                     |
+| n or arrow right  |displays next entry, unless at end of list, where it does nothing|displays next entry, unless at end of list, where it does nothing|✔                     |
+| p or arrow left  |displays previous entry, unless at beginning of list, where it does nothing|displays previous entry, unless at beginning of list, where it does nothing|✔                     |
+| enter             |brings up confirm interface|brings up confirm interface|✔                     |
+| s                 |goes back to start of add interface|goes back to start of add interface|✔                     |
+| q                 |quits to home interface|quits to home interface|✔                     |
 
 \
 &nbsp;
+#### Add interface - confirm screen
+- The following table goes through each possible key input in the confirmation part of the add interface, listing expected behavior and what actually occurs.
+|Key input          |Expected Behavior     |What Occurs         |Working as intended?   |
+|:------------------|:---------------------|:-------------------|:---------------------:|
+| enter             |initiates user input sequence|initiates user input sequence|✔                     |
+| b                 |returns to beginning of add interface|returns to beginning of add interface|✔                     |
+| q                 |quits to home interface|quits to home interface|✔                     |
+
+\
+&nbsp;
+### User input sequence
+- The following table goes through each part of the user input sequence that happens in the add interface and when the user edits entries in their library
+|Sequence part         |Expected Behavior     |What Occurs         |Working as intended?   |
+|:---------------------|:---------------------|:-------------------|:---------------------:|
+| rating               |updates gsheet with number from key press|updates gsheet with number from key press|✔                     |
+| read status          |updates gsheet with option from key press|updates gsheet with option from key press|✔                     |
+| own physical         |updates gsheet with option from key press|updates gsheet with option from key press|✔                     |
+| own audiobook        |updates gsheet with option from key press|updates gsheet with option from key press|✔                     |
+
+\
+&nbsp;
+### Browse and edit interface
 
 ### Bugs 
 
