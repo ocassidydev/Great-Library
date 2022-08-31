@@ -40,18 +40,18 @@ class Book:
     """
     def __init__(self, bookdata, search_bool=False):
         if search_bool:
-            self.title = bookdata.get('title', 'title not found')
-            self.author = bookdata.get('authors', 'author not found')[0]
-            self.pages = bookdata.get('pageCount', 'page count not found')
-            self.categories = ", ".join(bookdata.get('categories', ['genres not found']))
+            self.title = bookdata.get('title', 'Title not found')
+            self.author = bookdata.get('authors', 'Author not found')[0]
+            self.pages = bookdata.get('pageCount', 'Page count not found')
+            self.categories = ", ".join(bookdata.get('categories', ['Genres not found']))
             
             # Adds description subtended so it fits and displays properly on screen
-            description = bookdata.get('description', 'description not found').split(" ")
+            description = bookdata.get('description', 'Description not found.').split(" ")
             description_string = ""
             j = 0
             for i in range(4):
                 line_string = ""
-                while len(f"{line_string}{description[j]} ") <= (curses.COLS - 20):
+                while len(f"{line_string}{description[j]} ") <= (curses.COLS - 21):
                     if j > len(description):
                         break
                     line_string += f"{description[j]} "
@@ -405,7 +405,7 @@ class AddUI(DisplayBookMixin, ConsoleUI):
         self.book_data = json.load(resp)
 
     def search_ui(self):
-        self.results_win = curses.newwin(2, curses.COLS-9, 9, 8)
+        self.results_win = curses.newwin(curses.LINES-10, curses.COLS-9, 9, 8)
         self.scr.addstr(12, 0, ("\tIs this the title you wish to add?\n\n"
                                 "\tEnter - confirm\n\tn - next result\n"
                                 "\tp - prev result\n\ts - enter new search"
@@ -444,9 +444,9 @@ class AddUI(DisplayBookMixin, ConsoleUI):
             if i != prev_i:
                 self.refresh_win(self.results_win, 
                                 ("Title: "
-                                f"{self.book_data['items'][i]['volumeInfo'].get('title', 'title not found')}"
+                                f"{self.book_data['items'][i]['volumeInfo'].get('title', 'Title not found')}"
                                 "\nAuthor: "
-                                f"{self.book_data['items'][i]['volumeInfo'].get('authors','author not found')[0]}"))
+                                f"{self.book_data['items'][i]['volumeInfo'].get('authors','Author not found')[0]}"))
                 
                 self.scr.move(20, 8)
                 prev_i = i
