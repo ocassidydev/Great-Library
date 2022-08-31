@@ -111,12 +111,9 @@ I wanted to give the user the option to create a more formal account.
 
 ***Delete book***
 
-
 &nbsp;
 
 ***Edit book description***
-
-I also wanted to add a means of having the cards animate as they appeared, preferably by moving from something graphical element that is stylized like a deck and to flip over from face down. This could be acheived in css at least in part, however until I can get cards to play sequentially doing this is redundant, the game would just skip to the round end messages while the player is still seeing card dealing animations and it would be too confusing. The same redesign as mentioned above would need to be implemented first.
 
 &nbsp;
 
@@ -200,7 +197,7 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 |:------------------|:---------------------|:-----------------------|:---------------------:|
 | r                 |Changes control window to select read status options|Changes control window to select read status options|✔                     |
 | o                 |Changes control window to select ownership status options|Changes control window to select ownership status options|✔                     |
-| a                 |Changes control window to search input|Changes control window to search input|✔                     |
+| a                 |Changes control window to select ownership status options|Changes control window to search input select ownership status options|✔                     |
 | q                 |Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
 
 \
@@ -210,13 +207,29 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 
 |Key input          |Expected Behavior     |What Occurs             |Working as intended?   |
 |:------------------|:---------------------|:-----------------------|:---------------------:|
-| r                 |Changes control window selecting read status|Changes control window selecting read status|✔                     |
-| o                 |Changes control window to search input|Changes control window to search input|✔                     |
-| a                 |Changes control window to search input|Changes control window to search input|✔                     |
+| w                 |displays browse interface with only books that the user wants to read|displays browse interface with only books that the user wants to read|✔                     |
+| r                 |displays browse interface with only books that the user is reading|displays browse interface with only books that the user is reading|✔                     |
+| f                 |displays browse interface with only books that the user has finished|displays browse interface with only books that the user has finished|✔                     |
+| o                 |displays browse interface with only books that the user owns physically|displays browse interface with only books that the user owns physically|✔                     |
+| d                 |displays browse interface with only books that the user owns as an audiobook|displays browse interface with only books that the user owns as an audiobook|✔                     |
 | q                 |Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
 
 \
 &nbsp;
+### Browse interface
+- The following table goes through each possible key input in the browse interface, listing expected behavior and what actually occurs.
+
+|Key input          |Expected Behavior     |What Occurs             |Working as intended?   |
+|:------------------|:---------------------|:-----------------------|:---------------------:|
+| n or arrow right  |displays next entry, unless at end of list, where it does nothing|displays next entry, unless at end of list, where it does nothing|✔                     |
+| p or arrow left  |displays previous entry, unless at beginning of list, where it does nothing|displays previous entry, unless at beginning of list, where it does nothing|✔                     |
+| e                 |initiates user input sequence|initiates user input sequence|✔                     |
+| q                 |quits to home interface|quits to home interface|✔                     |
+
+
+\
+&nbsp;
+
 ### Add interface
 - The following table goes through each possible text input in the search part of the add interface, listing expected behavior and what actually occurs.
 

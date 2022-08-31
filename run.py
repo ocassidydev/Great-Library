@@ -789,7 +789,7 @@ class HomeUI(ConsoleUI):
         Filters library by chosen category
         """
         if self.category == "Status":
-            cat_string = "read status"
+            cat_string = "read"
         else:
             cat_string = "own"
 
