@@ -160,7 +160,7 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 - The following table goes through each possible key input in the search options part of the home interface, listing expected behavior and what actually occurs.
 |Key input          |Expected Behavior     |What Occurs             |Working as intended?   |
 |:------------------|:---------------------|:-----------------------|:---------------------:|
-| t                 |Opens browse libary UI|Opens browse library UI |✔                     |
+| t                 |Changes control window to search input|Changes control window to search input|✔                     |
 | a                 |Opens add book UI     |Opens add book UI       |✔                     |
 | g                 |Changes control window to search options|Changes control window to search options|✔                     |
 | q                 |Changes control window to sort options|Changes control window to sort options|✔                     |
@@ -171,7 +171,7 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 
 |Key input          |Expected Behavior     |What Occurs         |Working as intended?   |
 |:------------------|:---------------------|:-------------------|:---------------------:|
-||||✔                     |
+| t                 |||✔                     |
 ||||✔                     |
 ||||✔                     |
 

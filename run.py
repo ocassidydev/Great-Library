@@ -803,7 +803,7 @@ class HomeUI(ConsoleUI):
 
         # Handles case where no results of search query
         if len(searched_library) == 0:
-            self.controls.resize(1, 23)
+            self.controls.resize(1, 54)
             self.refresh_win(self.controls, "No Results found! Press any key to try another search")
             self.scr.move(14, 8)
             self.scr.getch()
@@ -892,7 +892,7 @@ def display_landing(stdscr):
     """
     landing = LandingUI(stdscr, "Great Library", 
                         ("\tWelcome to the great library,"
-                        "a console-based catalog of all\n"
+                        " a console-based catalog of all\n"
                         "\tthe books you have read, "
                         "and want to read!\n\n\tEnter your name: "))
 
@@ -908,8 +908,9 @@ def display_home(stdscr, library):
     home.render()
 
 def main(stdscr):
-    curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
-    stdscr.attron(curses.color_pair(1))
+    curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLACK)
+    BLUE_AND_BLACK = curses.color_pair(1)
+    stdscr.attron(BLUE_AND_BLACK)
 
     name, user = display_landing(stdscr)
     library = UserLibrary(name, user)
