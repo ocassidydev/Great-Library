@@ -90,8 +90,9 @@ class Book:
 
 class UserLibrary:
     """
-    Stores the user's data as a list of dictionaries for displaying and editing.
-    Contains various methods for filtering, sorting, and displaying the library.
+    Stores the user's data as a list of dictionaries for displaying 
+    and editing. Contains various methods for filtering, sorting, 
+    and displaying the library.
     """
     def __init__(self, name, user):
         self.name = name
@@ -128,8 +129,8 @@ class UserLibrary:
         
     def sort(self, cat):
         """
-        Function that returns an ordered list of book entry dictionaries corresponding
-        to a library sorted by the input category.
+        Function that returns an ordered list of book entry dictionaries 
+        corresponding to a library sorted by the input category.
         """
         if cat == "Title":
             # avoids soft copying and counting 'The' in alphabetization
@@ -176,11 +177,11 @@ class DisplayBookMixin:
     Mixin for a commonly used method of displaying information on the book 
     object on the screen and taking user input on book data.
     """
-    queries = ["","How would you rate this book out of 5? Hit enter if n/a.",
+    queries = ["", "How would you rate this book out of 5? Hit enter if n/a.",
                 ("Is this a book that you: want to read (w), are "
-                "currently reading (r),\nor have finished (f)?"),
-                "Do you own a physical copy? (y/n)",
-                "Do you own an audiobook of this book? (y/n)", ""]
+                    "currently reading (r),\nor have finished (f)?"),
+                    "Do you own a physical copy? (y/n)",
+                    "Do you own an audiobook of this book? (y/n)", ""]
 
     def display_book(self, book):
         self.attr_win = curses.newwin(13, curses.COLS-9, 7, 8)
@@ -501,7 +502,8 @@ class AddUI(DisplayBookMixin, ConsoleUI):
 
     def render(self):
         super().render()
-        control_win = curses.newwin(1, curses.COLS-9, 8, 8, "(Empty search to quit)")
+        control_win = curses.newwin(1, curses.COLS-9, 8, 8)
+        self.refresh_win(control_win, "(Empty search to quit)")
         self.query = self.user_input(10, 8).replace(" ", "+")
         if self.query == "":
             return
