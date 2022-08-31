@@ -584,7 +584,7 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
 
     def render(self):
         super().render()
-        self.scr.addstr(21, 8, "n - next\tp - prev\te - edit entry\tq - quit")
+        self.scr.addstr(21, 8, "n - next entry\tp - prev entry\te - edit entry\tq - quit")
         self.scroll_books()
         return
 
@@ -795,7 +795,6 @@ class HomeUI(ConsoleUI):
         """
         Takes users search term, calls BrowseUI with search results from library.
         """
-        self.controls.resize(1, 23)
         self.refresh_win(self.controls, "")
         self.panel(2, 51, ("(Note: mispelled searches will not return results)\n"
                         "Enter your search terms:"))
@@ -804,6 +803,7 @@ class HomeUI(ConsoleUI):
 
         # Handles case where no results of search query
         if len(searched_library) == 0:
+            self.controls.resize(1, 23)
             self.refresh_win(self.controls, "No Results found! Press any key to try another search")
             self.scr.move(14, 8)
             self.scr.getch()
@@ -908,6 +908,9 @@ def display_home(stdscr, library):
     home.render()
 
 def main(stdscr):
+    curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
+    stdscr.attron(curses.color_pair(1))
+
     name, user = display_landing(stdscr)
     library = UserLibrary(name, user)
     display_home(stdscr, library)

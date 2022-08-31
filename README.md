@@ -122,29 +122,50 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 
 ## Testing 
 ### Landing interface
-- The following table goes through each 
+- The following table goes through each text input in the landing interface, listing the expected behavior and what actually occurs. 
 
-|Key input                |Expected Behavior                                  |What Occurs                                        |Working as intended?   |
-|:------------------------|:--------------------------------------------------|:--------------------------------------------------|:---------------------:|
-||||✔                     |
-||||✔                     |
-||||✔                     |
-||||✔                     |
-||||✔                     |
-||||✔                     |
+|Text input                |Expected Behavior                                 |What Occurs                            |Working as intended?   |
+|:------------------------|:-------------------------------------------------|:--------------------------------------|:---------------------:|
+|Enter empty text         |Returns invalid entry, tells user to any key to any key to try again|Returns invalid entry, tells user to any key to any key to try again|✔                     |
+|Enter name (existing user)|Displays welcome and how many books user has, prompting key to enter account|Displays welcome and how many books user has, prompting key to enter account|✔                     |
+|Enter name (new user)|Displays welcome and tells user they do not have account, prompts key enter to create one|Displays welcome and tells user they do not have account, prompts key enter to create one|✔                     |
+\
+&nbsp;
+
+- The following table goes through each key input in the landing interface, listing the expected behavior and what actually occurs. 
+
+|Key input                  |Expected Behavior                                  |What Occurs                                        |Working as intended?   |
+|:--------------------------|:--------------------------------------------------|:--------------------------------------------------|:---------------------:|
+|   y                       |Opens home UI with user details                    |Opens home UI with user details                    |✔                     |
+|   n                       |Reopens landing UI from start                      |Reopens landing UI from start                      |✔                     |
 
 \
 &nbsp;
 
 ### Home interface
-- The following table goes through each 
+- The following table goes through each possible key input in the home interface, listing expected behavior and what actually occurs.
 
-|Key input          |Expected Behavior     |What Occurs          |Working as intended?   |
-|:------------------|:---------------------|:--------------------|:---------------------:|
-||||✔                     |
-||||✔                     |
+|Key input          |Expected Behavior     |What Occurs             |Working as intended?   |
+|:------------------|:---------------------|:-----------------------|:---------------------:|
+| b                 |Opens browse libary UI|Opens browse library UI |✔                     |
+| a                 |Opens add book UI     |Opens add book UI       |✔                     |
+| s                 |Changes control window to search options|Changes control window to search options|✔                     |
+| o                 |Changes control window to sort options|Changes control window to sort options|✔                     |
+| f                 |Changes control window to filter options|Changes control window to filter options|✔                     |
+| q                 |Closes out to landing UI|Closes out to landing UI|✔                     |
+
 \
 &nbsp;
+#### Home interface - search options
+- The following table goes through each possible key input in the search options part of the home interface, listing expected behavior and what actually occurs.
+|Key input          |Expected Behavior     |What Occurs             |Working as intended?   |
+|:------------------|:---------------------|:-----------------------|:---------------------:|
+| t                 |Opens browse libary UI|Opens browse library UI |✔                     |
+| a                 |Opens add book UI     |Opens add book UI       |✔                     |
+| g                 |Changes control window to search options|Changes control window to search options|✔                     |
+| q                 |Changes control window to sort options|Changes control window to sort options|✔                     |
+
+
 ### Add interface
 - The following table goes through each 
 
@@ -161,6 +182,7 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 
     - Bug where if user's library contains no books that have ratings (ie. user has entered n/a on all of them), then sorting by rating will crash the program as the returned sorted library is empty
     - Bug where if the user's library contains no books fitting a certain criteria (ie. no books that have been finished), then filtering by that criteria will as the returned filtered library is empty  
+    - Various bugs where windows would not display properly or empty.
 
 &nbsp;
 ### Libraries 
