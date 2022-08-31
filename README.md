@@ -191,7 +191,18 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 
 
 ### Add interface
-- The following table goes through each 
+- The following table goes through each possible text input in the search part of the add interface, listing expected behavior and what actually occurs.
+
+|Text input          |Expected Behavior     |What Occurs             |Working as intended?   |
+|:------------------|:---------------------|:-----------------------|:---------------------:|
+|Any input text     |Brings up relevant search results|Brings up relevant search result|✔                     |
+|Empty text input   |Closes out to home interface|Informs user there is no match, any keys to start search from search option interface|✔                     |
+|Empty text|Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
+
+
+\
+&nbsp;
+- The following table goes through each user input
 
 |Key input          |Expected Behavior     |What Occurs         |Working as intended?   |
 |:------------------|:---------------------|:-------------------|:---------------------:|
