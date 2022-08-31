@@ -694,27 +694,64 @@ class HomeUI(ConsoleUI):
             elif key == "q":
                 return 
     
+    def status_parse(self):
+        """
+        Parses the library to figure out which read status can be filtered by
+        """
+        self.status_control = "Which read status do you want to filter by?\n\n"
+        self.y = 4
+        self.statuses = [book["Status"] for book in self.library.books]
+        if "Want to read" in self.statuses:
+            self.status_control += "w - books you want to read\n"
+            self.y += 1
+        if "Currently reading" in self.statuses:
+            self.status_control += "r - books you are reading\n"
+            self.y += 1
+        if "Finished" in self.statuses:
+            self.status_control += "f - books you have finished\n"
+            self.y += 1
+        self.status_control += "\nq - quit"
+        return
+
+    def own_parse(self):
+        """
+        Parses the library to figure out which ownership status can be filtered by
+        """
+        phys_aud = self.category.split(" ")[1].lower()
+        self.status_control = (f"Which {phys_aud} ownership status" 
+                                "do you want to display by?\n\n")
+        self.y = 4
+        self.owns = [book[self.category] for book in self.library.books]
+        if "Yes" in self.owns:
+            self.status_control += f"o - own {phys_aud}\n"
+            self.y += 1
+        if "No" in self.owns:
+            self.status_control += f"d - don't own {phys_aud}\n"
+            self.y += 1
+
+        self.status_control += "\nq - quit"
+        return
+        
     def get_filter_input(self):
         """
         Gets the filter the user wants to impose on their chosen category
         """
         if "Status" in self.category:
-            self.panel(7, 44, ("Which read status do you want to filter by?\n"
-                            "\nw - books you want to read\nr - books you are"
-                            " reading\nf - books you have finished\n\nq - quit"))
+            self.status_parse()
+        
+            self.panel(self.y, 44, self.status_control)
             while True:
                 key = self.scr.getkey()
-                if key == "w":
+                if "Want to read" in self.statuses and key == "w":
                     return "Want to read"
-                elif key == "r":
+                elif "Currently reading" in self.statuses and key == "r":
                     return "Currently reading"
-                elif key == "f":
+                elif "Finished" in self.statuses and key == "f":
                     return "Finished"
+
         else:
-            phys_aud = self.category.split(" ")[1].lower()
-            self.panel(6, 60, (f"Which {phys_aud} ownership status do you want to "
-                            f"display by?\n\no - own {phys_aud}\nd - don't own "
-                            f"{phys_aud}\n\nq - quit"))
+            self.own_parse()
+            self.panel(self.y, 60, self.status_control)
             while True:
                 key = self.scr.getkey()
                 if key == "o":
