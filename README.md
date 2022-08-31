@@ -136,7 +136,7 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 
 |Key input                  |Expected Behavior                                  |What Occurs                                        |Working as intended?   |
 |:--------------------------|:--------------------------------------------------|:--------------------------------------------------|:---------------------:|
-|   y                       |Opens home UI with user details                    |Opens home UI with user details                    |✔                     |
+|   y or enter              |Opens home UI with user details                    |Opens home UI with user details                    |✔                     |
 |   n                       |Reopens landing UI from start                      |Reopens landing UI from start                      |✔                     |
 
 \
@@ -206,8 +206,9 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 |Key input          |Expected Behavior     |What Occurs         |Working as intended?   |
 |:------------------|:---------------------|:-------------------|:---------------------:|
 | n or arrow right  |displays next entry, unless at end of list, where it does nothing||✔                     |
-||||✔                     |
-||||✔                     |
+| p or arrow left  |displays previous entry, unless at beginning of list, where it does nothing||✔                     |
+| enter             |brings up confirm interface||✔                     |
+| enter             |brings up confirm interface||✔                     |
 
 \
 &nbsp;

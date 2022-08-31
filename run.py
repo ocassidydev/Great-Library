@@ -372,7 +372,7 @@ class LandingUI(ConsoleUI):
         """
         while True:
             key = self.scr.getkey()
-            if key == "y":
+            if key == "y" or key == "\n":
                 if not self.check_for_user():
                     #creates new sheet from template for user data
                     SHEET.duplicate_sheet(0,new_sheet_name=self.user)
@@ -498,7 +498,7 @@ class AddUI(DisplayBookMixin, ConsoleUI):
 
     def render(self):
         super().render()
-        control_win = self.scr.newwin(8, 8, "(Empty search to quit)")
+        control_win = curses.newwin(8, 8, "(Empty search to quit)")
         self.query = self.user_input(10, 8).replace(" ", "+")
         if self.query == "":
             return
