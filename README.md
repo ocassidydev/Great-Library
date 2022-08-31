@@ -16,6 +16,8 @@
     \
     &nbsp;
 
+![Account](assets/readme_images/GreatLibrary.PNG)
+
 &nbsp;
 - __Home interface__
 
@@ -26,6 +28,7 @@
     \
     &nbsp;
 
+![Home](assets/readme_images/Home.PNG)
 
 &nbsp;
 - __Add book interface__
@@ -42,6 +45,8 @@
     \
     &nbsp;
 
+![Add](assets/readme_images/Add.PNG)
+
 &nbsp;
 - __Browse interface__ 
 
@@ -53,6 +58,8 @@
     - This is a valuable feature to the user, as it allows them to navigate their library, and update information on individual books that they have.
     \
     &nbsp;
+
+![Browse](assets/readme_images/Browse.PNG)
 
 &nbsp;
 - __Search option__
