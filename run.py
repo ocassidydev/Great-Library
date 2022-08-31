@@ -617,7 +617,7 @@ class HomeUI(ConsoleUI):
                             "f - filter books by\n\nq - save and quit")
         self.sort_control = ("t - sort by title\na - sort by author\n"
                             "p - sort by pages\ng - sort by genres\n"
-                            "r - sort by rating\n\nq - quit")
+                            "\nq - quit")
         self.filter_control = ("r - filter by read status\n"
                                 "o - filter by physical ownership\n"
                                 "a - filter by audiobook ownership\n\n"
@@ -660,7 +660,10 @@ class HomeUI(ConsoleUI):
         elif type == "search":
             self.panel(5, 21, self.search_control)
         elif type == "sort":
-            self.panel(7, 19, self.sort_control)
+            if len(self.library.sort("sort")) == 0:
+                self.panel(6, 19, self.sort_control)
+            else:
+                self.panel(6, 19, self.sort_control.replace("\n\n", "\nr - sort by rating\n\n"))
         elif type == "filter":
             self.panel(5, 34, self.filter_control)
 
@@ -686,7 +689,7 @@ class HomeUI(ConsoleUI):
                 return self.sort("pages")
             elif key == "g":
                 return self.sort("genres") 
-            elif key == "r":
+            elif len(self.library.sort("sort")) != 0 and key == "r":
                 return self.sort("rating")
             elif key == "q":
                 return 
@@ -765,7 +768,7 @@ class HomeUI(ConsoleUI):
         # Handles case where no results of search query
         if len(searched_library) == 0:
             self.refresh_win(self.controls, "No Results found! Press any key to try another search")
-            self.scr.move(9, 8)
+            self.scr.move(14, 8)
             self.scr.getch()
             self.change_main_panel("search")
             self.search_user_control()
