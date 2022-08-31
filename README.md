@@ -129,9 +129,9 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 |Enter empty text         |Returns invalid entry, tells user to any key to any key to try again|Returns invalid entry, tells user to any key to any key to try again|✔                     |
 |Enter name (existing user)|Displays welcome and how many books user has, prompting key to enter account|Displays welcome and how many books user has, prompting key to enter account|✔                     |
 |Enter name (new user)|Displays welcome and tells user they do not have account, prompts key enter to create one|Displays welcome and tells user they do not have account, prompts key enter to create one|✔                     |
+
 \
 &nbsp;
-
 - The following table goes through each key input in the landing interface, listing the expected behavior and what actually occurs. 
 
 |Key input                  |Expected Behavior                                  |What Occurs                                        |Working as intended?   |
@@ -189,24 +189,23 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 | p                 |Changes control window to search input|Changes control window to search input|✔                     |
 | g                 |Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
 
-
+\
+&nbsp;
 ### Add interface
 - The following table goes through each possible text input in the search part of the add interface, listing expected behavior and what actually occurs.
 
 |Text input          |Expected Behavior     |What Occurs             |Working as intended?   |
 |:------------------|:---------------------|:-----------------------|:---------------------:|
 |Any input text     |Brings up relevant search results|Brings up relevant search result|✔                     |
-|Empty text input   |Closes out to home interface|Informs user there is no match, any keys to start search from search option interface|✔                     |
-|Empty text|Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
-
+|Empty text input   |Closes out to home interface|Closes out to home interface|✔                     |
 
 \
 &nbsp;
-- The following table goes through each user input
+- The following table goes through each possible key input in the search results part of the add interface, listing expected behavior and what actually occurs.
 
 |Key input          |Expected Behavior     |What Occurs         |Working as intended?   |
 |:------------------|:---------------------|:-------------------|:---------------------:|
-|                  |||✔                     |
+| n or arrow right  |displays next entry, unless at end of list, where it does nothing||✔                     |
 ||||✔                     |
 ||||✔                     |
 

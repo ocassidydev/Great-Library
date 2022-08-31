@@ -498,9 +498,11 @@ class AddUI(DisplayBookMixin, ConsoleUI):
 
     def render(self):
         super().render()
+        control_win = self.scr.newwin(8, 8, "(Empty search to quit)")
         self.query = self.user_input(10, 8).replace(" ", "+")
         if self.query == "":
             return
+        self.refresh_win(control_win, "")
         self.search()
         self.search_ui()
         self.main_user_control()
@@ -884,7 +886,7 @@ class HomeUI(ConsoleUI):
                     return self.render()
             if key == "a": 
                 add = AddUI(self.scr, "Add book", ("\tPlease enter the title"
-                            " of the book you wish to add:\n\t(Empty search to quit)"), self.library)
+                            " of the book you wish to add:"), self.library)
                 add.render()
                 return self.render()
             elif key == "q":
