@@ -207,7 +207,7 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
     - Bug where if user's library contains no books that have ratings (ie. user has entered n/a on all of them), then sorting by rating will crash the program as the returned sorted library is empty
     - Bug where if the user's library contains no books fitting a certain criteria (ie. no books that have been finished), then filtering by that criteria will as the returned filtered library is empty  
     - Various bugs where windows would not display properly or empty. These varied in severity, from slightly breaking the interface to completely crashing the program.
-    - Occasional bug in add interface where search results from google break in the window
+    - Occasional bug in add interface where search results from google break in the window due to title being too long
 
 &nbsp;
 ### Libraries 

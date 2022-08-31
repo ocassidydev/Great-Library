@@ -40,7 +40,12 @@ class Book:
     """
     def __init__(self, bookdata, search_bool=False):
         if search_bool:
-            self.title = bookdata.get('title', 'Title not found')
+            title = bookdata.get('title', 'Title not found')
+            if len(title) >= curses.COLS - 9:
+                self.title = f"{title[:curses.COLS-12]}..."
+            else:
+                self.title = title
+
             self.author = bookdata.get('authors', 'Author not found')[0]
             self.pages = bookdata.get('pageCount', 'Page count not found')
             self.categories = ", ".join(bookdata.get('categories', ['Genres not found']))
