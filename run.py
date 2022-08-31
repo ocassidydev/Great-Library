@@ -770,7 +770,7 @@ class HomeUI(ConsoleUI):
                 elif "Finished" in self.statuses and key == "f":
                     return "Finished"
                 elif key == "q":
-                    return
+                    return "q"
 
         else:
             self.own_parse()
@@ -782,7 +782,7 @@ class HomeUI(ConsoleUI):
                 elif key == "d":
                     return "No"
                 elif key == "q":
-                    return
+                    return "q"
 
     def filter(self):
         """
@@ -794,6 +794,8 @@ class HomeUI(ConsoleUI):
             cat_string = "own"
 
         self.filter_opt = self.get_filter_input()
+        if self.filter_opt == "q":
+            return
         filter_library = self.library.filter(self.category, self.filter_opt)
         browse = BrowseUI(self.scr, f"Filter by {cat_string}", "", self.library, filter_library, self.category, self.filter_opt)
         return browse.render()

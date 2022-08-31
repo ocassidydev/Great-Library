@@ -194,7 +194,19 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 \
 &nbsp;
 #### Home interface - filter options
-- The following table goes through each possible key input in the sort options part of the home interface, listing expected behavior and what actually occurs.
+- The following table goes through each possible key input in the filter options part of the home interface, listing expected behavior and what actually occurs.
+
+|Key input          |Expected Behavior     |What Occurs             |Working as intended?   |
+|:------------------|:---------------------|:-----------------------|:---------------------:|
+| r                 |Changes control window to select read status options|Changes control window to select read status options|✔                     |
+| o                 |Changes control window to select ownership status options|Changes control window to select ownership status options|✔                     |
+| a                 |Changes control window to search input|Changes control window to search input|✔                     |
+| q                 |Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
+
+\
+&nbsp;
+#### Home interface - filter options
+- The following table goes through each possible key input in the filter parameters part of the home interface, listing expected behavior and what actually occurs.
 
 |Key input          |Expected Behavior     |What Occurs             |Working as intended?   |
 |:------------------|:---------------------|:-----------------------|:---------------------:|
