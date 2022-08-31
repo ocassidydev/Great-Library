@@ -8,7 +8,7 @@ import json
 from pyfiglet import Figlet
 import curses
 from curses import wrapper
-from curses.textpad import Textbox, rectangle
+from curses.textpad import Textbox
 
 from datetime import datetime
 
@@ -48,10 +48,13 @@ class Book:
 
             self.author = bookdata.get('authors', 'Author not found')[0]
             self.pages = bookdata.get('pageCount', 'Page count not found')
-            self.categories = ", ".join(bookdata.get('categories', ['Genres not found']))
+            self.categories = ", ".join(
+                bookdata.get('categories', ['Genres not found']))
             
-            # Adds description subtended so it fits and displays properly on screen
-            description = bookdata.get('description', 'Description not found.').split(" ")
+            # Adds description subtended so it fits and displays properly on
+            # screen
+            description = bookdata.get(
+                'description', 'Description not found.').split(" ")
             description_string = ""
             j = 0
             for i in range(4):
@@ -498,7 +501,7 @@ class AddUI(DisplayBookMixin, ConsoleUI):
 
     def render(self):
         super().render()
-        control_win = curses.newwin(8, 8, "(Empty search to quit)")
+        control_win = curses.newwin(1, curses.COLS-9, 8, 8, "(Empty search to quit)")
         self.query = self.user_input(10, 8).replace(" ", "+")
         if self.query == "":
             return
@@ -576,11 +579,11 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
             if i != prev_i:
                 self.book = Book(books[i])
                 self.browse_display_book()
-                
+
                 prev_i = i
 
             key = self.scr.getkey()
-            
+
             if key == "KEY_RIGHT" or key == "n":
                 if not i == len(books)-1:
                     i += 1
