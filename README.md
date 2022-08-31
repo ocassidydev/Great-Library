@@ -184,10 +184,12 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 
 |Key input          |Expected Behavior     |What Occurs             |Working as intended?   |
 |:------------------|:---------------------|:-----------------------|:---------------------:|
-| t                 |Changes control window to search input|Changes control window to search input|✔                     |
-| a                 |Changes control window to search input|Changes control window to search input|✔                     |
-| p                 |Changes control window to search input|Changes control window to search input|✔                     |
-| g                 |Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
+| t                 |Displays browse interface of books in alphabetical order by title|Displays browse interface of books in alphabetical order by title|✔                     |
+| a                 |Displays browse interface of books in alphabetical order by author first name|Displays browse interface of books in alphabetical order by author first name|✔                     |
+| p                 |Displays browse interface of books in ascending order of pages|Displays browse interface of books in ascending order of pages|✔                     |
+| g                 |Displays browse interface of books in alphabetical order by genres|Displays browse interface of books in alphabetical order by genres|✔                     |
+| r                 |Displays browse interface of books in descending order by rating|Displays browse interface of books in descending order by rating|✔                     |
+| q                 |Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
 
 \
 &nbsp;
@@ -196,10 +198,10 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 
 |Key input          |Expected Behavior     |What Occurs             |Working as intended?   |
 |:------------------|:---------------------|:-----------------------|:---------------------:|
-| t                 |Changes control window to search input|Changes control window to search input|✔                     |
+| r                 |Changes control window selecting read status|Changes control window selecting read status|✔                     |
+| o                 |Changes control window to search input|Changes control window to search input|✔                     |
 | a                 |Changes control window to search input|Changes control window to search input|✔                     |
-| p                 |Changes control window to search input|Changes control window to search input|✔                     |
-| g                 |Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
+| q                 |Goes back to starting state of home interface|Goes back to starting state of home interface|✔                     |
 
 \
 &nbsp;
@@ -250,10 +252,11 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 
 ### Bugs 
 
-    - Bug where if user's library contains no books that have ratings (ie. user has entered n/a on all of them), then sorting by rating will crash the program as the returned sorted library is empty
-    - Bug where if the user's library contains no books fitting a certain criteria (ie. no books that have been finished), then filtering by that criteria will as the returned filtered library is empty  
+    - Bug where if user's library contains no books that have ratings (ie. user has entered n/a on all of them), then sorting by rating will crash the program as the returned sorted library is empty.
+    - Bug where if the user's library contains no books fitting a certain criteria (ie. no books that have been finished), then filtering by that criteria will as the returned filtered library is empty.  
     - Various bugs where windows would not display properly or empty. These varied in severity, from slightly breaking the interface to completely crashing the program.
-    - Occasional bug in add interface where search results from google break in the window due to title being too long
+    - Occasional bug in add interface where search results from google break in the window due to title being too long.
+    - Rare bug in add interface for certain book titles where the process of parsing the title string into a book object crashes program.
 
 &nbsp;
 ### Libraries 

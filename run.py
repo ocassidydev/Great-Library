@@ -136,9 +136,9 @@ class UserLibrary:
         """
         if cat == "Title":
             # avoids soft copying and counting 'The' in alphabetization
-            sort_attrs = [book[cat].replace("The ", "") for book in self.books]
+            sort_attrs = [book[cat].replace("The ", "").replace("A ", "") for book in self.books]
             sort_attrs.sort()
-            attrs = [book[cat].replace("The ", "") for book in self.books]
+            attrs = [book[cat].replace("The ", "").replace("A ", "") for book in self.books]
 
             sorted_books = []
             for s_attr in sort_attrs:
@@ -769,6 +769,8 @@ class HomeUI(ConsoleUI):
                     return "Currently reading"
                 elif "Finished" in self.statuses and key == "f":
                     return "Finished"
+                elif key == "q":
+                    return
 
         else:
             self.own_parse()
@@ -779,6 +781,8 @@ class HomeUI(ConsoleUI):
                     return "Yes"
                 elif key == "d":
                     return "No"
+                elif key == "q":
+                    return
 
     def filter(self):
         """
@@ -807,7 +811,7 @@ class HomeUI(ConsoleUI):
                 self.category = "Own Physical"
                 return self.filter()
             elif key == "a":
-                self.catgory = "Own Audiobook"
+                self.category = "Own Audiobook"
                 return self.filter()
             elif key == "q":
                 return
