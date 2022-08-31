@@ -40,7 +40,7 @@ class Book:
     """
     def __init__(self, bookdata, search_bool=False):
         if search_bool:
-            title = bookdata.get('title', 'Title not found')
+            title = bookdata.get('title', 'Title not found').replace("\n", "")
             if len(title) >= curses.COLS - 23:
                 self.title = f"{title[:curses.COLS-26]}..."
             else:
@@ -73,7 +73,7 @@ class Book:
 
                 if i == 3 and len(line_string) >= curses.COLS - 32:
                     description_string = " ".join(description_string.split(" ")[:-3]) + "..."
-            except:
+            except IndexError:
                 description_string = " ".join(description)
             
             self.description = description_string
