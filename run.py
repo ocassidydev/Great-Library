@@ -41,8 +41,8 @@ class Book:
     def __init__(self, bookdata, search_bool=False):
         if search_bool:
             title = bookdata.get('title', 'Title not found')
-            if len(title) >= curses.COLS - 22:
-                self.title = f"{title[:curses.COLS-25]}..."
+            if len(title) >= curses.COLS - 23:
+                self.title = f"{title[:curses.COLS-26]}..."
             else:
                 self.title = title
 
@@ -410,7 +410,7 @@ class AddUI(DisplayBookMixin, ConsoleUI):
         self.book_data = json.load(resp)
 
     def search_ui(self):
-        self.results_win = curses.newwin(2, curses.COLS-9, 9, 8)
+        self.results_win = curses.newwin(curses.LINES-10, curses.COLS-9, 9, 8)
         self.scr.addstr(12, 0, ("\tIs this the title you wish to add?\n\n"
                                 "\tEnter - confirm\n\tn - next result\n"
                                 "\tp - prev result\n\ts - enter new search"
