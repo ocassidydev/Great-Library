@@ -503,12 +503,15 @@ class AddUI(DisplayBookMixin, ConsoleUI):
     def render(self):
         super().render()
         control_win = curses.newwin(1, curses.COLS-9, 8, 8)
-        self.refresh_win(control_win, "(Empty search to quit)")
+        self.scr.refresh()
+        control_win.addstr("(Empty search to quit)")
+        control_win.refresh()
         self.query = self.user_input(10, 8).replace(" ", "+")
         if self.query == "":
             return
-        self.refresh_win(control_win, "")
         self.search()
+        control_win.clear()
+        control_win.refresh()
         self.search_ui()
         self.main_user_control()
         return
