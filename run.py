@@ -51,7 +51,7 @@ class Book:
             j = 0
             for i in range(4):
                 line_string = ""
-                while len(f"{line_string}{description[j]} ") <= (curses.COLS - 21):
+                while len(f"{line_string}{description[j]} ") <= (curses.COLS - 20):
                     if j > len(description):
                         break
                     line_string += f"{description[j]} "
