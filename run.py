@@ -753,8 +753,9 @@ class HomeUI(ConsoleUI):
 
     def search(self):
         """
-        Takes users search term, call
+        Takes users search term, calls BrowseUI with search results from library.
         """
+        self.controls.resize(1, 23)
         self.refresh_win(self.controls, "")
         self.panel(2, 51, ("(Note: mispelled searches will not return results)\n"
                         "Enter your search terms:"))
