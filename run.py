@@ -623,7 +623,7 @@ class HomeUI(ConsoleUI):
                                 "a - filter by audiobook ownership\n\n"
                                 "q - quit")
         self.search_control = ("t - search by title\na - search by author\n"
-                                "\ng - search by genres\n\nq - quit")
+                                "g - search by genres\n\nq - quit")
 
     def update_time(self):
         """
@@ -658,7 +658,7 @@ class HomeUI(ConsoleUI):
             else:
                 self.panel(3, 13, "a - add book\n\nq - quit")
         elif type == "search":
-            self.panel(6, 21, self.search_control)
+            self.panel(5, 21, self.search_control)
         elif type == "sort":
             self.panel(7, 19, self.sort_control)
         elif type == "filter":
