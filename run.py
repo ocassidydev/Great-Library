@@ -41,8 +41,8 @@ class Book:
     def __init__(self, bookdata, search_bool=False):
         if search_bool:
             title = bookdata.get('title', 'Title not found')
-            if len(title) >= curses.COLS - 21:
-                self.title = f"{title[:curses.COLS-24]}..."
+            if len(title) >= curses.COLS - 22:
+                self.title = f"{title[:curses.COLS-25]}..."
             else:
                 self.title = title
 
@@ -449,7 +449,7 @@ class AddUI(DisplayBookMixin, ConsoleUI):
             if i != prev_i:
                 self.refresh_win(self.results_win, 
                                 ("Title: "
-                                f"{self.book_data['items'][i]['volumeInfo'].get('title', 'Title not found')[:curses.COLS-16]}"
+                                f"{self.book_data['items'][i]['volumeInfo'].get('title', 'Title not found')[:curses.COLS-17]}"
                                 "\nAuthor: "
                                 f"{self.book_data['items'][i]['volumeInfo'].get('authors','Author not found')[0]}"))
                 
