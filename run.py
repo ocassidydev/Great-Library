@@ -908,10 +908,6 @@ def display_home(stdscr, library):
     home.render()
 
 def main(stdscr):
-    curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLACK)
-    BLUE_AND_BLACK = curses.color_pair(1)
-    stdscr.attron(BLUE_AND_BLACK)
-
     name, user = display_landing(stdscr)
     library = UserLibrary(name, user)
     display_home(stdscr, library)
