@@ -1,0 +1,1 @@
+print(len("(Mispelled searches will not return results. Empty search to quit)"))

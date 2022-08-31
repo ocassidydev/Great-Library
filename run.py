@@ -272,8 +272,8 @@ class ConsoleUI:
         Creates a textbox for the user to enter at position (x, y)
         Returns the user input
         """
-        win = curses.newwin(1, curses.COLS-(x+1), y, x)
-        box = Textbox(win)
+        self.text_win = curses.newwin(1, curses.COLS-(x+1), y, x)
+        box = Textbox(self.text_win)
         self.scr.refresh()
         box.edit()
 
@@ -350,9 +350,11 @@ class LandingUI(ConsoleUI):
         self.user = self.name.replace(" ", "")
 
         if self.check_for_user():
+            book_num = len(SHEET.worksheet(self.user).get_all_values())-1
+            entry_string = "entry" if book_num == 1 else "entries"
             self.scr.addstr(13, 0, ("\tYou have an active account with "
-                                    f"{len(SHEET.worksheet(self.user).get_all_values())-1} "
-                                    "entries. Access your library? (y/n)"))
+                                    f"{book_num} {entry_string}."
+                                    " Access your library? (y/n)"))
         else:
             self.scr.addstr(13, 0, ("\tYou have not yet created an account. "
                                     "Create a new account? (y/n)"))
@@ -791,26 +793,35 @@ class HomeUI(ConsoleUI):
             elif key == "q":
                 return
 
+    def search_failed(self):
+        """
+        Executes sequence for when search returns no results
+        """
+        self.refresh_win(self.controls, "")
+        self.controls.resize(1, 54)
+        self.refresh_win(self.controls, "No Results found! Press any key to try another search")
+        self.scr.move(14, 8)
+        self.scr.getch()
+        self.change_main_panel("search")
+        return self.search_user_control()
+
     def search(self):
         """
         Takes users search term, calls BrowseUI with search results from library.
         """
         self.refresh_win(self.controls, "")
-        self.panel(2, 51, ("(Note: mispelled searches will not return results)\n"
+        self.panel(2, 67, ("(Mispelled searches will not return results. Empty search to quit)\n"
                         "Enter your search terms:"))
         search = self.user_input(13, 33)
+        if search == "":
+            return
+
         searched_library = self.library.search(self.category, search)
 
         # Handles case where no results of search query
         if len(searched_library) == 0:
-            self.controls.resize(1, 54)
-            self.refresh_win(self.controls, "No Results found! Press any key to try another search")
-            self.scr.move(14, 8)
-            self.scr.getch()
-            self.change_main_panel("search")
-            self.search_user_control()
-            return
-        
+            return self.search_failed()
+
         browse = BrowseUI(self.scr, "Search", "", self.library, searched_library)
         return browse.render()
 

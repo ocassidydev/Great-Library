@@ -161,9 +161,9 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 |Key input          |Expected Behavior     |What Occurs             |Working as intended?   |
 |:------------------|:---------------------|:-----------------------|:---------------------:|
 | t                 |Changes control window to search input|Changes control window to search input|✔                     |
-| a                 |Opens add book UI     |Opens add book UI       |✔                     |
-| g                 |Changes control window to search options|Changes control window to search options|✔                     |
-| q                 |Changes control window to sort options|Changes control window to sort options|✔                     |
+| a                 |Changes control window to search input|Changes control window to search input|✔                     |
+| g                 |Changes control window to search input|Changes control window to search input|✔                     |
+| q                 |Goes back to starting state on home UI|Goes back to starting state on home UI|✔                     |
 
 
 ### Add interface
@@ -171,7 +171,7 @@ I also wanted to add a means of having the cards animate as they appeared, prefe
 
 |Key input          |Expected Behavior     |What Occurs         |Working as intended?   |
 |:------------------|:---------------------|:-------------------|:---------------------:|
-| t                 |||✔                     |
+|                  |||✔                     |
 ||||✔                     |
 ||||✔                     |
 
