@@ -453,10 +453,10 @@ class AddUI(DisplayBookMixin, ConsoleUI):
             if key == "\n":
                 self.add_book = Book(self.book_data['items'][i]['volumeInfo'], True)
                 return self.confirm_ui()
-            elif key == "n":
+            elif key == "KEY_RIGHT" or key == "n":
                 if not i == len(self.book_data['items'])-1:
                     i += 1
-            elif key == "p":
+            elif key == "KEY_LEFT" or key == "p":
                 if not i == 0:
                     i -= 1
             elif key == "s":
@@ -570,10 +570,10 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
 
             key = self.scr.getkey()
             
-            if key == "KEY_RIGHT":
+            if key == "KEY_RIGHT" or key == "n":
                 if not i == len(books)-1:
                     i += 1
-            elif key == "KEY_LEFT":
+            elif key == "KEY_LEFT" or key == "p":
                 if not i == 0:
                     i -= 1
             elif key == "e":
