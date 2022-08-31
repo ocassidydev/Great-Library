@@ -914,7 +914,7 @@ def main(stdscr):
 
 wrapper(main)
 
-# try:
-#     wrapper(main)
-# except Exception, err:
-#     print(f"Program failed, error: {str(err)}. Click 'run program' to restart")
+try:
+    wrapper(main)
+except Exception as e:
+    print(f"Program failed, error: {e}. Click 'run program' to restart")
