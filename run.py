@@ -273,7 +273,6 @@ class ConsoleUI:
         self.scr = stdscr
         self.heading = heading
         self.message = message
-        self.text_win = None
 
     def render_heading(self):
         """
@@ -330,9 +329,6 @@ class LandingUI(ConsoleUI):
     """
     def __init__(self, stdscr, heading, message):
         super().__init__(stdscr, heading, message)
-        self.book_data = None
-        self.name = None
-        self.results_win - None
 
     def check_for_user(self):
         """
@@ -563,8 +559,6 @@ class BrowseUI(DisplayBookMixin, ConsoleUI):
         self.ordered_library = ordered_library
         self.category = category
         self.filter_opt = filter_opt
-        self.book = None
-        self.query_win = None
 
     def edit_book(self, i):
         """
@@ -690,7 +684,6 @@ class HomeUI(ConsoleUI):
                                "q - quit")
         self.search_control = ("t - search by title\na - search by author\n"
                                "g - search by genres\n\nq - quit")
-        self.controls = None
 
     def update_time(self):
         """
@@ -716,7 +709,6 @@ class HomeUI(ConsoleUI):
         self.scr.refresh()
         self.refresh_win(self.controls, string)
         self.scr.move(y + lines + 1, x)
-        self.status_control = None
 
     def display_controls(self, cont):
         """
