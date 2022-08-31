@@ -803,6 +803,7 @@ class HomeUI(ConsoleUI):
         self.scr.move(14, 8)
         self.scr.getch()
         self.change_main_panel("search")
+        self.refresh_win(self.text_win, "")
         return self.search_user_control()
 
     def search(self):
