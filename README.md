@@ -1,6 +1,6 @@
 # Great Library
 
-[Great Library](https://github.com/ocassidydev/great-library) is a console-based application for cataloging books, enabling the user to rate books, record which books they want to read, are reading, and have read, and whether they own the books in print or audiobook format. The application allows viewing the user's entire library of books, their library sorted according to various categories, filtered by certain conditions, and for the user to update information about their book entries. The program uses a [Google Sheet](https://docs.google.com/spreadsheets/d/15-ZM3D7ZH2NcnCf3NG3w2YhyYDXDlKf4xA415rN88O8/edit?usp=sharing) to store and retrieve library data. This is an excellent organising tool for people who can have books stored across a wide variety of formats, but are not prepared to use more time-consuming and busy interfaces to catalog their collection such as goodreads or google books.
+[Great Library](https://great-library-fde6d6f75a0e.herokuapp.com/) is a console-based application for cataloging books, enabling the user to rate books, record which books they want to read, are reading, and have read, and whether they own the books in print or audiobook format. The application allows viewing the user's entire library of books, their library sorted according to various categories, filtered by certain conditions, and for the user to update information about their book entries. The program uses a [Google Sheet](https://docs.google.com/spreadsheets/d/1r0Kl7Xaa5RcH6bKSRPbH1xvOEh9fi6DSxUq2e1IvBR4/edit?usp=sharing) to store and retrieve library data. This is an excellent organising tool for people who can have books stored across a wide variety of formats, but are not prepared to use more time-consuming and busy interfaces to catalog their collection such as goodreads or google books.
 
 ## Features 
 
@@ -337,7 +337,7 @@ Another feature I considered was a means to update book descriptions. Often, the
 
 - For local deployment, run the following command:
 
-      git clone https://github.com/ocassidydev/blackjack.git
+      git clone https://github.com/ocassidydev/great-library.git
 
 &nbsp;
 ## Credits 

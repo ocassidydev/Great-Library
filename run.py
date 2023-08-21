@@ -31,7 +31,6 @@ GBOOKS = "https://www.googleapis.com/books/v1/volumes?q=intitle:"
 # FIGLET
 F = Figlet()
 
-
 class Book:
     """
     Stores book data for easier recall and use.
@@ -374,7 +373,7 @@ class LandingUI(ConsoleUI):
         self.user = self.name.replace(" ", "")
 
         if self.check_for_user():
-            book_num = len(SHEET.worksheet(self.user).get_all_values())-1
+            book_num = len(SHEET.worksheet(self.user).get_all_values())
             entry_string = "entry" if book_num == 1 else "entries"
             self.scr.addstr(13, 0, ("\tYou have an active account with "
                                     f"{book_num} {entry_string}."
